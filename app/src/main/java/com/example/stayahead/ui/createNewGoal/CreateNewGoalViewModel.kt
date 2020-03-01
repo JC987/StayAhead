@@ -1,10 +1,10 @@
-package com.example.stayahead.ui.tools
+package com.example.stayahead.ui.createNewGoal
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class ToolsViewModel : ViewModel() {
+class CreateNewGoalViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is tools Fragment"

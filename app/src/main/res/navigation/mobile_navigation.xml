@@ -13,21 +13,21 @@
 
     <fragment
         android:id="@+id/nav_previous_goal"
-        android:name="com.example.stayahead.ui.gallery.GalleryFragment"
+        android:name="com.example.stayahead.ui.previousGoal.PreviousGoalFragment"
         android:label="@string/menu_previous_goal"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_previous_goals" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.stayahead.ui.slideshow.SlideshowFragment"
+        android:name="com.example.stayahead.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/nav_create_goal"
-        android:name="com.example.stayahead.ui.tools.ToolsFragment"
+        android:name="com.example.stayahead.ui.createNewGoal.CreateNewGoalFragment"
         android:label="@string/menu_create_goal"
-        tools:layout="@layout/fragment_tools" />
+        tools:layout="@layout/fragment_create_new_goal" />
 
     <fragment
         android:id="@+id/nav_share"

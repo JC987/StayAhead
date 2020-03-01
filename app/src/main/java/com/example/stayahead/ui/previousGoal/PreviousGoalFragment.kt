@@ -1,4 +1,4 @@
-package com.example.stayahead.ui.tools
+package com.example.stayahead.ui.previousGoal
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,20 +10,20 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.stayahead.R
 
-class ToolsFragment : Fragment() {
+class PreviousGoalFragment : Fragment() {
 
-    private lateinit var toolsViewModel: ToolsViewModel
+    private lateinit var galleryViewModel: PreviousGoalViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        toolsViewModel =
-            ViewModelProviders.of(this).get(ToolsViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_tools, container, false)
-        val textView: TextView = root.findViewById(R.id.text_tools)
-        toolsViewModel.text.observe(this, Observer {
+        galleryViewModel =
+            ViewModelProviders.of(this).get(PreviousGoalViewModel::class.java)
+        val root = inflater.inflate(R.layout.fragment_previous_goals, container, false)
+        val textView: TextView = root.findViewById(R.id.text_gallery)
+        galleryViewModel.text.observe(this, Observer {
             textView.text = it
         })
         return root
