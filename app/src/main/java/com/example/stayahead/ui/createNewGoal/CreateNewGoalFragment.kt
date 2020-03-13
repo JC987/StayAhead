@@ -51,6 +51,7 @@ class CreateNewGoalFragment : Fragment() {
         return root
     }
 
+
     //TODO: Create dialog boxes for remove item and picking date and time
     fun removeItem(et: EditText): Boolean{
         linearLayout.removeView(et)
