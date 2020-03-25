@@ -1,10 +1,26 @@
 package com.example.stayahead
 
-class Goal(val goalName: String, var remainingPercentage: String, var listofCheckpoint: ArrayList<Checkpoint>){
-   /* var goalName = "def_name"
-    var remainingPercentage = "10%"
+class Goal(var goalName: String, var remainingPercentage: String, var listofCheckpoint: ArrayList<Checkpoint>){
+
     var listOfCheckpoints = ArrayList<Checkpoint>()
-*/
+
+    fun addCheckpoint(cp:Checkpoint){
+        listOfCheckpoints.add(cp)
+    }
+    fun getList():ArrayList<Checkpoint>{
+        return listOfCheckpoints
+    }
+    fun removeCheckpoint(cp:Checkpoint){
+        listOfCheckpoints.remove(cp)
+    }
+    fun setName(name:String){
+        goalName = name
+    }
+    fun setPercentage(per:String){
+        remainingPercentage = per
+    }
+    
+
     fun getDefDateString() : String{
        return "02/28/2020"
    }

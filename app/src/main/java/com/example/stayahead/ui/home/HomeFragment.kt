@@ -34,9 +34,9 @@ class HomeFragment : Fragment() {
 
         val listItems = ArrayList<Goal>()
         var cpList = ArrayList<Checkpoint>()
-        cpList.add(Checkpoint("first",true))
-        cpList.add(Checkpoint("second", false))
-        cpList.add(Checkpoint("third", false))
+        cpList.add(Checkpoint("first", "asdf", "zxcv",true))
+        cpList.add(Checkpoint("second","asdf", "zxcv", false))
+        cpList.add(Checkpoint("third", "asdf", "zxcv",false))
         val goal = Goal("test goal", "99%", cpList)
         listItems.add(goal)
         listItems.add(goal)

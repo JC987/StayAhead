@@ -75,7 +75,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnPickDueDate" />
 
-        <LinearLayout
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -85,7 +85,7 @@
             app:layout_constraintStart_toStartOf="parent"
             >
 
-        </LinearLayout>
+        </TableLayout>
 
         <Button
             android:layout_width="match_parent"
