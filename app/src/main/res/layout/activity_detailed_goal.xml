@@ -10,7 +10,7 @@
 
 
         <TextView
-            android:id="@+id/detailedGoalName"
+            android:id="@+id/tvGoalNameDetailed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -20,27 +20,58 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="0dp"
-            android:layout_toStartOf="@+id/detailedGoalDueDate"
-            android:hint="goal name here"
+            android:layout_toStartOf="@+id/tvPercentageDetailed"
+            android:text="goal name here"
             android:textColor="#000"
             android:textSize="24sp" />
 
 
         <TextView
-            android:id="@+id/detailedGoalDueDate"
+            android:id="@+id/tvPercentageDetailed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:hint="MM/DD/YYYY"
+            android:text="100%"
+            android:textColor="#000"
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/tvFinishedDetailed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@id/tvGoalNameDetailed"
+            android:layout_marginStart="8dp"
+
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/tvGoalDueDateDetailed"
+            android:text="Still Ongoing"
+            android:textColor="#000"
+            android:textSize="24sp" />
+
+
+        <TextView
+            android:id="@+id/tvGoalDueDateDetailed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/tvPercentageDetailed"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="8dp"
+            android:text="MM/DD/YYYY"
+            android:textColor="#000"
             android:textSize="18sp" />
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/detailedGoalName"
+            android:layout_below="@+id/tvFinishedDetailed"
             android:layout_marginTop="32dp">
 
                 <TableLayout

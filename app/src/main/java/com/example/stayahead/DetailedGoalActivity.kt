@@ -17,13 +17,21 @@ class DetailedGoalActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detailed_goal)
-        val tvGoalName = findViewById<TextView>(R.id.detailedGoalName)
-        val tvDueDate = findViewById<TextView>(R.id.detailedGoalDueDate)
+        val tvGoalName = findViewById<TextView>(R.id.tvGoalNameDetailed)
+        val tvDueDate = findViewById<TextView>(R.id.tvGoalDueDateDetailed)
+        val tvFinished = findViewById<TextView>(R.id.tvFinishedDetailed)
+        val tvPercentage = findViewById<TextView>(R.id.tvPercentageDetailed)
 
         //linearLayout = findViewById<LinearLayout>(R.id.detailedLinearLayout)
         tableLayout = findViewById<TableLayout>(R.id.detailedTableLayout)
         tvGoalName.text = (intent.getStringExtra("goal_name"))
         tvDueDate.text = "Due: " + intent.getStringExtra("goal_due_date")
+        tvFinished.text = if(intent.getBooleanExtra("goal_finished", false))
+            "Completed"
+        else
+            "Ongoing"
+        tvPercentage.text = intent.getStringExtra("goal_percent")
+
        // var t = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
 
 

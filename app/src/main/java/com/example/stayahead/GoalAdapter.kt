@@ -38,6 +38,7 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
                 intent.putExtra("goal_due_date", goal.getDefDateString())
                 intent.putExtra("goal_checkpoints",goal.getList())
                 intent.putExtra("goal_percent", goal.remainingPercentage)
+                intent.putExtra("goal_finished", goal.isFinished)
                 itemView.context.startActivity(intent)
             }
         }
