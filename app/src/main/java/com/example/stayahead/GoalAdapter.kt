@@ -33,9 +33,10 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
 
                 Toast.makeText(itemView.context,"item pressed "+ goal.goalName + "  " + goal.remainingPercentage,Toast.LENGTH_SHORT).show()
                 val intent = Intent(itemView.context,DetailedGoalActivity::class.java)
+
                 intent.putExtra("goal_name",goal.goalName)
                 intent.putExtra("goal_due_date", goal.getDefDateString())
-                intent.putExtra("goal_checkpoints",goal.listofCheckpoint)
+                intent.putExtra("goal_checkpoints",goal.getList())
                 intent.putExtra("goal_percent", goal.remainingPercentage)
                 itemView.context.startActivity(intent)
             }

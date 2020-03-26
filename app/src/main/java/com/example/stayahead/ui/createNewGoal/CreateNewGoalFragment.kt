@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.stayahead.Checkpoint
+import com.example.stayahead.DatabaseHelper
 import com.example.stayahead.Goal
 import com.example.stayahead.R
 import com.google.android.material.snackbar.Snackbar
@@ -67,17 +68,19 @@ class CreateNewGoalFragment : Fragment() {
     }
 
     private fun submit() {
+        newGoal = Goal(etGoalName.text.toString(),"0%",false)
         for (i:Int in 0..cpList.size - 1){
             val et =  cpList.get(i).getChildAt(0) as EditText
             val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
             val t = (cpList.get(i).getChildAt(2) as Button).text.toString()
             newGoal.addCheckpoint(Checkpoint(et.text.toString(),d,t,false))
             Log.d("cpList: ", "${et.text}")
-           // Log.d("cpList: ", "${cpList.get(i).getChildAt(1)}")
-            //Log.d("cpList: ", "${cpList.get(i).children}")
         }
-
+        val db = DatabaseHelper(root.context)
+        db.addData(newGoal)
+        parentFragmentManager.popBackStack()
     }
+
 
 
     //TODO: Create dialog boxes for remove item and picking date and time
