@@ -36,11 +36,11 @@ class HomeFragment : Fragment() {
 
         val db = DatabaseHelper(root.context)
 
-        val c = db.getData(false)
+        val c = db.getAllGoalData(false)
         while(c.moveToNext()){
             Log.d("TAG","       c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4))
             val bool = c.getInt(4) > 0
-            val newGoal = Goal(c.getString(1),c.getString(2), bool)
+            val newGoal = Goal(c.getString(1),c.getString(2), bool, c.getInt(0))
             listItems.add(newGoal)
         }
 
@@ -67,10 +67,10 @@ class HomeFragment : Fragment() {
         val db = DatabaseHelper(root.context)
         //db.deleteDB()
        // db.deleteDB()
-        val goal = Goal("test goal", "99%", false )
-        val goal2 = Goal("cooper sucks", "15%", true )
-        db.addData(goal)
-        db.addData(goal2)
+        //val goal = Goal("test goal", "99%", false )
+        //val goal2 = Goal("cooper sucks", "15%", true )
+        //db.addGoalData(goal)
+        //db.addGoalData(goal2)
 
 
     }

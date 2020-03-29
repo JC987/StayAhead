@@ -39,25 +39,31 @@ class DetailedGoalActivity : AppCompatActivity() {
     }
 
     private fun createCheckpoints() {
-        val list = intent.getParcelableArrayListExtra<Checkpoint>("goal_checkpoints")
+        //val list = intent.getParcelableArrayListExtra<Checkpoint>("goal_checkpoints")
         //var tvParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
         var tvParams = TableRow.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT,4.5f)
         var cbParams = TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT,0.5f)
-        for(item in list){
+        val db = DatabaseHelper(this)
+        val c = db.getCheckpointsForGoal(intent.getIntExtra("goal_id",0))
 
-            Log.d(TAG,"createCheckpoints: "+ item.checkpointName)
+
+        while(c.moveToNext()){
+            Log.d("TAG","    :" + c.count +"   c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4))
+            val ckName = c.getString(1)
+            val ckCompleted = c.getInt(4) > 0
+
+            //Log.d(TAG,"createCheckpoints: "+ item.checkpointName)
             var newTextView = TextView(this)
             var newCheckBox = CheckBox(this)
             newTextView.layoutParams = tvParams
-            var t = item.checkpointName
 
-            newTextView.text = t
+            newTextView.text = ckName
             newTextView.setTextColor(Color.BLACK)
             newTextView.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             newTextView.setTextSize(18f)
 
             newCheckBox.layoutParams = cbParams
-            newCheckBox.isChecked = item.isComplete
+            newCheckBox.isChecked = ckCompleted
 
             var tableRow = TableRow(this)
             tableRow.addView(newTextView)
@@ -65,6 +71,7 @@ class DetailedGoalActivity : AppCompatActivity() {
             tableRow.setPadding(8,16,8,16)
 
             tableLayout.addView(tableRow)
+
         }
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

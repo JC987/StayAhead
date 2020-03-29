@@ -1,6 +1,6 @@
 package com.example.stayahead
 
-class Goal(var goalName: String, var remainingPercentage: String, var isFinished: Boolean){
+class Goal(var goalName: String, var remainingPercentage: String, var isFinished: Boolean, var goalId: Int){
 
     var listOfCheckpoints = ArrayList<Checkpoint>()
 

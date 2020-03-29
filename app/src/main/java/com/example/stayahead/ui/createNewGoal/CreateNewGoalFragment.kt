@@ -68,16 +68,21 @@ class CreateNewGoalFragment : Fragment() {
     }
 
     private fun submit() {
-        newGoal = Goal(etGoalName.text.toString(),"0%",false)
+        val db = DatabaseHelper(root.context)
+        val id = (db.getGoalDBCount() + 1).toInt()
+        Log.d("TAG","id is "+ id)
+        newGoal = Goal(etGoalName.text.toString(),"0%",false,id)
         for (i:Int in 0..cpList.size - 1){
             val et =  cpList.get(i).getChildAt(0) as EditText
             val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
             val t = (cpList.get(i).getChildAt(2) as Button).text.toString()
-            newGoal.addCheckpoint(Checkpoint(et.text.toString(),d,t,false))
+            val ck = Checkpoint(et.text.toString(),d,t,false, id)
+            newGoal.addCheckpoint(ck)
+            db.addCheckpointData(ck)
             Log.d("cpList: ", "${et.text}")
         }
-        val db = DatabaseHelper(root.context)
-        db.addData(newGoal)
+
+        db.addGoalData(newGoal)
         parentFragmentManager.popBackStack()
     }
 

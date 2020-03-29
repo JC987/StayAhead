@@ -39,6 +39,7 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
                 intent.putExtra("goal_checkpoints",goal.getList())
                 intent.putExtra("goal_percent", goal.remainingPercentage)
                 intent.putExtra("goal_finished", goal.isFinished)
+                intent.putExtra("goal_id", goal.goalId)
                 itemView.context.startActivity(intent)
             }
         }

@@ -8,6 +8,6 @@ import kotlinx.android.parcel.Parcelize
 import org.jetbrains.annotations.NotNull
 
 @Parcelize
-data class Checkpoint(var checkpointName: String, var date: String,var time: String, var isComplete: Boolean): Parcelable{
+data class Checkpoint(var checkpointName: String, var date: String,var time: String, var isCompleted: Boolean, var goalId: Int = 0): Parcelable{
 
 }
