@@ -17,6 +17,9 @@ class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var root: View
+    private lateinit var db :DatabaseHelper
+    private lateinit var rvList :RecyclerView
+    var listItems = ArrayList<Goal>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,52 +29,38 @@ class HomeFragment : Fragment() {
             ViewModelProviders.of(this).get(HomeViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_home, container, false)
         Log.d("TAG","home!")
-        val rvList = root.findViewById<RecyclerView>(R.id.rvList)
-       /* homeViewModel.text.observe(this, Observer {
-            textView.text = it
-        })*/
-       // testDB()
-        val listItems = ArrayList<Goal>()
-        var cpList = ArrayList<Checkpoint>()
+        rvList = root.findViewById<RecyclerView>(R.id.rvList)
 
-        val db = DatabaseHelper(root.context)
+        listItems = ArrayList<Goal>()
 
-        val c = db.getAllGoalData(false)
-        while(c.moveToNext()){
-            Log.d("TAG","       c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4))
-            val bool = c.getInt(4) > 0
-            val newGoal = Goal(c.getString(1),c.getString(2), bool, c.getInt(0))
-            listItems.add(newGoal)
-        }
+        db = DatabaseHelper(root.context)
 
-        /*  cpList.add(Checkpoint("first", "asdf", "zxcv",true))
-        cpList.add(Checkpoint("second","asdf", "zxcv", false))
-        cpList.add(Checkpoint("third", "asdf", "zxcv",false))
-        val goal = Goal("goal", "99%", false)
-        for(cp in cpList){
 
-            goal.addCheckpoint(cp)
-        }
-        listItems.add(goal)
-        listItems.add(goal)
-        listItems.add(goal)
-        listItems.add(goal)*/
-        //val adapter = ArrayAdapter(this,R.layout.active_goal_list_item, R.id.goalListText1, listItems)
-        rvList.layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.VERTICAL, false)
-        var adapter = GoalAdapter(listItems)
-        rvList.adapter = adapter
         return root
     }
 
-    fun testDB(){
-        val db = DatabaseHelper(root.context)
-        //db.deleteDB()
-       // db.deleteDB()
-        //val goal = Goal("test goal", "99%", false )
-        //val goal2 = Goal("cooper sucks", "15%", true )
-        //db.addGoalData(goal)
-        //db.addGoalData(goal2)
 
+    override fun onStart() {
+        super.onStart()
+        listItems.clear()
+        Log.d("TAG", "HF:: on resume")
+        val c = db.getAllGoalData(false)
+        while(c.moveToNext()){
+            //                                          goal name               percent                    date                          finished
+            Log.d("TAG","       c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4))
+            val bool = c.getInt(4) > 0
+            val newGoal = Goal(c.getString(1),c.getString(2), c.getString(3), bool, c.getInt(0))
+            listItems.add(newGoal)
+        }
+
+        rvList.layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.VERTICAL, false)
+        val adapter = GoalAdapter(listItems)
+        rvList.adapter = adapter
+    }
+
+    fun testDB(){
+        //val db = DatabaseHelper(root.context)
+        //db.deleteDB()
 
     }
 

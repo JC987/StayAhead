@@ -43,26 +43,26 @@
             android:id="@+id/tvFinishedDetailed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/tvGoalNameDetailed"
             android:layout_alignParentStart="true"
-            android:layout_alignTop="@id/tvGoalNameDetailed"
-            android:layout_marginStart="8dp"
 
-            android:layout_marginTop="64dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="0dp"
             android:layout_toStartOf="@+id/tvGoalDueDateDetailed"
             android:text="Still Ongoing"
             android:textColor="#000"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
 
         <TextView
             android:id="@+id/tvGoalDueDateDetailed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/tvPercentageDetailed"
+            android:layout_below="@id/tvGoalNameDetailed"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:text="MM/DD/YYYY"
             android:textColor="#000"

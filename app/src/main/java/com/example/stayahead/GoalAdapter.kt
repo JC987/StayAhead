@@ -1,6 +1,8 @@
 package com.example.stayahead
 
+import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +37,7 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
                 val intent = Intent(itemView.context,DetailedGoalActivity::class.java)
 
                 intent.putExtra("goal_name",goal.goalName)
-                intent.putExtra("goal_due_date", goal.getDefDateString())
+                intent.putExtra("goal_due_date", goal.getDateAsString())
                 intent.putExtra("goal_checkpoints",goal.getList())
                 intent.putExtra("goal_percent", goal.remainingPercentage)
                 intent.putExtra("goal_finished", goal.isFinished)
@@ -48,33 +50,3 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
 
 
 
-
-/*
-class GoalAdapter : RecyclerView.Adapter<GoalAdapter.ViewHolder>{
-
-    fun GoalAdapter(mainActivity: MainActivity, goal: List<Goal>){
-        context = timelineActivity
-        this.tweets = tweets
-    }
-    //
-
-    inner class ViewHolder(viewItem: View) : RecyclerView.ViewHolder(viewItem) {
-       // internal var ivProfileImage: ImageView
-        internal var tvGoalName: TextView
-        internal var tvRemainingPercent: TextView
-     //   internal var tvTimestamp: TextView
-
-        init {
-            tvGoalName = viewItem.findViewById(R.id.goalListText1)
-            tvRemainingPercent = viewItem.findViewById(R.id.goalListText2)
-
-        }
-
-        fun bind(goal: Goal) {
-            tvGoalName.setText((goal.goalName))
-            tvRemainingPercent.setText(goal.remainingPrecentage)
-          //  Glide.with(context).load(tweet.user.imageUrl).into(ivProfileImage)
-
-        }
-    }
-}*/

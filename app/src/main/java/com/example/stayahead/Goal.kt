@@ -1,6 +1,6 @@
 package com.example.stayahead
 
-class Goal(var goalName: String, var remainingPercentage: String, var isFinished: Boolean, var goalId: Int){
+class Goal(var goalName: String, var remainingPercentage: String, var date: String, var isFinished: Boolean, var goalId: Int){
 
     var listOfCheckpoints = ArrayList<Checkpoint>()
 
@@ -20,6 +20,11 @@ class Goal(var goalName: String, var remainingPercentage: String, var isFinished
         remainingPercentage = per
     }
     
+    fun getDateAsString(): String{
+        if(date == "")
+            return getDefDateString()
+        return date
+    }
 
     fun getDefDateString() : String{
        return "02/28/2020"

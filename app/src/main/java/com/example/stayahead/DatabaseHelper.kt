@@ -79,9 +79,23 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(CHECKPOINT_COL4, checkpoint.isCompleted)
         val result = db.insert(CHECKPOINT_TABLE_NAME, null, contentValues)
         val i: Int = -1
+        db.close()
         Log.d("TAG", "added called")
         return result != i.toLong()
     }
+
+    fun updateCheckpointCompleted(id:Int, value:Int){
+        val db = this.writableDatabase
+        db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL4 = $value WHERE ID = $id")
+        db.close()
+    }
+
+    fun updateGoalPercentage(id:Int, per:String){
+        val db = this.writableDatabase
+        db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL2 = $per WHERE ID = $id")
+        db.close()
+    }
+
 
     /**
      * Returns all data

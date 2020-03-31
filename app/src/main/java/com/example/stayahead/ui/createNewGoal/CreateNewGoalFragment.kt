@@ -31,7 +31,6 @@ class CreateNewGoalFragment : Fragment() {
     private lateinit var newGoal: Goal
     private lateinit var cpList: ArrayList<TableRow>
     private lateinit var btnSubmit: Button
-   // private lateinit var btnDueTime: Button
     private val TAG = "CreateNewGoalFragment:"
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +40,6 @@ class CreateNewGoalFragment : Fragment() {
         toolsViewModel =
             ViewModelProviders.of(this).get(CreateNewGoalViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_create_new_goal, container, false)
-        val etGoalName: EditText = root.findViewById(R.id.etGoalName)
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
         val btnDueTime: Button = root.findViewById(R.id.btnPickDueTime)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
@@ -71,8 +69,10 @@ class CreateNewGoalFragment : Fragment() {
         val db = DatabaseHelper(root.context)
         val id = (db.getGoalDBCount() + 1).toInt()
         Log.d("TAG","id is "+ id)
-        newGoal = Goal(etGoalName.text.toString(),"0%",false,id)
-        for (i:Int in 0..cpList.size - 1){
+        // can get a view by its id name
+        newGoal = Goal(etGoalName.text.toString(),"0.0", btnPickDueDate.text.toString(),
+            false, id)
+        for (i:Int in 0 until cpList.size){
             val et =  cpList.get(i).getChildAt(0) as EditText
             val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
             val t = (cpList.get(i).getChildAt(2) as Button).text.toString()
@@ -123,10 +123,13 @@ class CreateNewGoalFragment : Fragment() {
                 "${tp.currentHour}:${tp.currentMinute}"
 
         }
+        val tmp = tvDateAndTime.text.toString() + btn.text.toString()
+        tvDateAndTime.text = tmp
         dialog.create()
         dialog.show()
 
-    } fun datePickerDialog(btn:Button){
+    }
+    fun datePickerDialog(btn:Button){
         val view = View.inflate(root.context,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
 
@@ -138,6 +141,9 @@ class CreateNewGoalFragment : Fragment() {
             btn.text = "${dp.year}${dp.month}${dp.dayOfMonth}"
 
         }
+
+        val tmp = tvDateAndTime.text.toString() + btn.text.toString()
+        tvDateAndTime.text = tmp
         dialog.create()
         dialog.show()
 
