@@ -30,7 +30,7 @@ class PreviousGoalFragment : Fragment() {
         val c = db.getFinishedGoals()
         if(c.count < 1){
             val tvPreviousGoalFragment: TextView = root.findViewById(R.id.tvPreviousGoalFragment)
-            tvPreviousGoalFragment.visibility = View.GONE
+            tvPreviousGoalFragment.visibility = View.VISIBLE
         }
         val listOfGoals = ArrayList<Goal>()
         while(c.moveToNext()){

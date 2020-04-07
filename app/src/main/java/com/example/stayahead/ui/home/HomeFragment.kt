@@ -55,7 +55,7 @@ class HomeFragment : Fragment() {
         }
         if(c.count < 1){
             val tvHomeFragment = root.findViewById<TextView>(R.id.tvHomeFragment)
-            tvHomeFragment.visibility = View.GONE
+            tvHomeFragment.visibility = View.VISIBLE
         }
 
         rvList.layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.VERTICAL, false)

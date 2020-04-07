@@ -13,6 +13,7 @@ import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.marginLeft
 import androidx.core.view.marginStart
+import com.example.stayahead.ui.createNewGoal.CreateNewGoalFragment
 import com.example.stayahead.ui.home.HomeFragment
 import java.text.DecimalFormat
 
@@ -26,6 +27,7 @@ class DetailedGoalActivity : AppCompatActivity() {
     var goalId = -1
     var numOfCheckpoint: Float = 0f
     var numChecked: Float = 0f
+    var isFinished = false
     val db = DatabaseHelper(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +41,12 @@ class DetailedGoalActivity : AppCompatActivity() {
         tableLayout = findViewById<TableLayout>(R.id.detailedTableLayout)
         tvGoalName.text = (intent.getStringExtra("goal_name"))
         tvDueDate.text = "Due: " + intent.getStringExtra("goal_due_date")
-        tvFinished.text = if(intent.getBooleanExtra("goal_finished", false))
-            "Completed"
+        if(intent.getBooleanExtra("goal_finished", false)) {
+            tvFinished.text = "Completed"
+            isFinished = true
+        }
         else
-            "Ongoing"
+            tvFinished.text = "Ongoing"
 
         goalPercent = intent.getStringExtra("goal_percent")
         tvPercentage.text = "$goalPercent %"
@@ -72,6 +76,10 @@ class DetailedGoalActivity : AppCompatActivity() {
             val tvCheckpointName = TextView(this)
             val tvCheckpointDate = TextView(this)
             val cbCheckpoint = CheckBox(this)
+
+            if(isFinished)
+                cbCheckpoint.isEnabled = false
+
             tvCheckpointName.layoutParams = tvParams
             tvCheckpointDate.layoutParams = tvParams2
 
@@ -132,6 +140,10 @@ class DetailedGoalActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.detailed_goal_menu, menu)
+        if(isFinished) {
+            menu.findItem(R.id.action_edit_goal).isVisible = false
+            menu.findItem(R.id.action_complete).isVisible = false
+        }
         return true
     }
 
@@ -140,13 +152,13 @@ class DetailedGoalActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.action_complete -> finishGoal()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
             R.id.action_delete -> deleteGoal()//Toast.makeText(this,"GOAL deleted", Toast.LENGTH_LONG).show()
-            R.id.action_edit_goal -> Toast.makeText(this,"GOAL edited", Toast.LENGTH_LONG).show()
+            R.id.action_edit_goal -> editGoal()//Toast.makeText(this,"GOAL edited", Toast.LENGTH_LONG).show()
         }
         return super.onOptionsItemSelected(item)
     }
 
     fun finishGoal(){
-        if(goalId == -1)
+        if(goalId == -1 || isFinished)
             return
         db.finishGoal(goalId)
         db.close()
@@ -166,6 +178,10 @@ class DetailedGoalActivity : AppCompatActivity() {
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(i)
     }
+    fun editGoal(){
+
+    }
+
 
     override fun onPause() {
         Log.d("TAG", "on PAUSED called")

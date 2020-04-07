@@ -105,7 +105,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     fun getFinishedGoals(): Cursor{
         val db = this.writableDatabase
         val c = db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL4 = 1", null)
-        //db.close()
+        //db.close() don't close connection!
         return c
     }
 
