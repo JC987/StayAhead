@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,6 +52,10 @@ class HomeFragment : Fragment() {
             val bool = c.getInt(4) > 0
             val newGoal = Goal(c.getString(1),c.getString(2), c.getString(3), bool, c.getInt(0))
             listItems.add(newGoal)
+        }
+        if(c.count < 1){
+            val tvHomeFragment = root.findViewById<TextView>(R.id.tvHomeFragment)
+            tvHomeFragment.visibility = View.GONE
         }
 
         rvList.layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.VERTICAL, false)

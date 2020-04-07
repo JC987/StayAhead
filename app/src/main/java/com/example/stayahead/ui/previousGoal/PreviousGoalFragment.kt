@@ -8,24 +8,42 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.stayahead.DatabaseHelper
+import com.example.stayahead.Goal
+import com.example.stayahead.GoalAdapter
 import com.example.stayahead.R
 
 class PreviousGoalFragment : Fragment() {
 
-    private lateinit var galleryViewModel: PreviousGoalViewModel
+    lateinit var db:DatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        galleryViewModel =
-            ViewModelProviders.of(this).get(PreviousGoalViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_previous_goals, container, false)
-        val textView: TextView = root.findViewById(R.id.text_gallery)
-        galleryViewModel.text.observe(this, Observer {
-            textView.text = it
-        })
+        val rv = root.findViewById<RecyclerView>(R.id.rvPreviousGoalFragment)
+        db = DatabaseHelper(root.context)
+        val c = db.getFinishedGoals()
+        if(c.count < 1){
+            val tvPreviousGoalFragment: TextView = root.findViewById(R.id.tvPreviousGoalFragment)
+            tvPreviousGoalFragment.visibility = View.GONE
+        }
+        val listOfGoals = ArrayList<Goal>()
+        while(c.moveToNext()){
+            val bool = c.getInt(4) > 0
+            val newGoal = Goal(c.getString(1),c.getString(2), c.getString(3), bool, c.getInt(0))
+            listOfGoals.add(newGoal)
+        }
+
+        val adapter = GoalAdapter(listOfGoals)
+
+        rv.layoutManager = LinearLayoutManager(root.context,LinearLayoutManager.VERTICAL,false)
+        rv.adapter = adapter
+
         return root
     }
 }

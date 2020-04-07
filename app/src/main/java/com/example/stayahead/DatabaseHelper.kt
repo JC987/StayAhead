@@ -96,6 +96,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         db.close()
     }
 
+    fun finishGoal(goalId:Int){
+        val db = this.writableDatabase
+        db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL4 = 1 WHERE ID = $goalId")
+        db.close()
+    }
+
+    fun getFinishedGoals(): Cursor{
+        val db = this.writableDatabase
+        val c = db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL4 = 1", null)
+        //db.close()
+        return c
+    }
+
+    fun deleteGoal(goalId:Int){
+        val db = this.writableDatabase
+        db.execSQL("DELETE FROM $GOAL_TABLE_NAME WHERE ID = $goalId")
+        db.close()
+    }
 
     /**
      * Returns all data
@@ -107,9 +125,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
 
         //db.execSQL("CREATE TABLE IF NOT EXISTS "+ GOAL_TABLE_NAME);
         return if (desc) db.rawQuery(
-            "SELECT * FROM $GOAL_TABLE_NAME ORDER BY id DESC",
+            "SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL4 = 0 ORDER BY id DESC",
             null
-        ) else db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME", null)
+        ) else db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL4 = 0" , null)
 
     }
 

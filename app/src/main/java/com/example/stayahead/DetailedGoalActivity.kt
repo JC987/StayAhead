@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.marginLeft
@@ -22,6 +23,7 @@ class DetailedGoalActivity : AppCompatActivity() {
     lateinit  var tvPercentage: TextView
     val map = mutableMapOf<Int, Int>()
     var goalPercent = ""
+    var goalId = -1
     var numOfCheckpoint: Float = 0f
     var numChecked: Float = 0f
     val db = DatabaseHelper(this)
@@ -44,8 +46,7 @@ class DetailedGoalActivity : AppCompatActivity() {
 
         goalPercent = intent.getStringExtra("goal_percent")
         tvPercentage.text = "$goalPercent %"
-
-       // var t = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+        goalId = intent.getIntExtra("goal_id",-1)
 
 
         createCheckpoints()
@@ -81,7 +82,7 @@ class DetailedGoalActivity : AppCompatActivity() {
             tvCheckpointName.textSize = 18f
            // tvCheckpointName.width = 200
 
-                        tvCheckpointDate.text = "Due on: \n${currentCheckpoint.date}"
+                        tvCheckpointDate.text = "Due on: \n${convertDateToStandardView(currentCheckpoint.date)}"
                         tvCheckpointDate.setTextColor(Color.BLACK)
                         tvCheckpointDate.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
                         tvCheckpointDate.textSize = 18f
@@ -118,9 +119,9 @@ class DetailedGoalActivity : AppCompatActivity() {
             val tableRow = TableRow(this)
             tableRow.layoutParams = tbParams
 
-            tableRow.addView(tvCheckpointDate)
             tableRow.addView(tvCheckpointName)
             tableRow.addView(cbCheckpoint)
+            tableRow.addView(tvCheckpointDate)
 
             tableRow.setPadding(16,32,16,32)
 
@@ -132,6 +133,38 @@ class DetailedGoalActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.detailed_goal_menu, menu)
         return true
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.action_complete -> finishGoal()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
+            R.id.action_delete -> deleteGoal()//Toast.makeText(this,"GOAL deleted", Toast.LENGTH_LONG).show()
+            R.id.action_edit_goal -> Toast.makeText(this,"GOAL edited", Toast.LENGTH_LONG).show()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun finishGoal(){
+        if(goalId == -1)
+            return
+        db.finishGoal(goalId)
+        db.close()
+
+        val i = Intent(this, SideNavDrawer::class.java)
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(i)
+    }
+
+    fun deleteGoal(){
+        if(goalId == -1)
+            return
+        db.deleteGoal(goalId)
+        db.close()
+
+        val i = Intent(this, SideNavDrawer::class.java)
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(i)
     }
 
     override fun onPause() {
@@ -152,5 +185,12 @@ class DetailedGoalActivity : AppCompatActivity() {
         Log.d("TAG", "on finish called")
         super.finish()
 
+    }
+    fun convertDateToStandardView(date:String) : String{
+
+        var s = date.substring(4)
+        s += date.substring(0,4)
+
+        return s
     }
 }
