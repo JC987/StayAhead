@@ -57,11 +57,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         return result != i.toLong()
     }
 
-    fun getGoalDBCount(): Long{
+    fun getGoalDBCount(): Int{
         val db = this.readableDatabase
-        val count = DatabaseUtils.queryNumEntries(db, GOAL_TABLE_NAME)
-        db.close()
-        return count
+        val c = db.rawQuery("SELECT seq FROM SQLITE_SEQUENCE WHERE name = '$GOAL_TABLE_NAME'",null)
+        c.moveToFirst()
+        return c.getInt(0)
     }
     fun getCheckpointsForGoal(id: Int): Cursor{
         val db = this.writableDatabase
@@ -79,7 +79,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(CHECKPOINT_COL4, checkpoint.isCompleted)
         val result = db.insert(CHECKPOINT_TABLE_NAME, null, contentValues)
         val i: Int = -1
-        db.close()
+        //db.close()
         Log.d("TAG", "added called")
         return result != i.toLong()
     }
@@ -87,19 +87,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     fun updateCheckpointCompleted(id:Int, value:Int){
         val db = this.writableDatabase
         db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL4 = $value WHERE ID = $id")
-        db.close()
+       // db.close()
     }
 
     fun updateGoalPercentage(id:Int, per:String){
         val db = this.writableDatabase
         db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL2 = $per WHERE ID = $id")
-        db.close()
+       // db.close()
     }
 
     fun finishGoal(goalId:Int){
         val db = this.writableDatabase
         db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL4 = 1 WHERE ID = $goalId")
-        db.close()
+      //  db.close()
     }
 
     fun getFinishedGoals(): Cursor{
@@ -112,6 +112,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     fun deleteGoal(goalId:Int){
         val db = this.writableDatabase
         db.execSQL("DELETE FROM $GOAL_TABLE_NAME WHERE ID = $goalId")
+        db.execSQL("DELETE FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $goalId")
         db.close()
     }
 
@@ -159,6 +160,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     fun deleteItem(title: String) {
         val db = this.writableDatabase
         db.execSQL("DELETE FROM  $GOAL_TABLE_NAME WHERE $GOAL_COL1 = '$title'")
+        db.close()
+    }
+
+    fun getGoal(goalId: Int): Cursor {
+        val db = this.writableDatabase
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE ID = $goalId", null)
+
+    }
+
+    fun getAllCheckpointsOfGoal(goalId: Int): Cursor{
+        val db = this.writableDatabase
+        val c = db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $goalId", null)
+        return c
     }
 
     companion object {

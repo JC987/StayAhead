@@ -67,8 +67,8 @@ class CreateNewGoalFragment : Fragment() {
 
     private fun submit() {
         val db = DatabaseHelper(root.context)
-        val id = (db.getGoalDBCount() + 1).toInt()
-        Log.d("TAG","id is "+ id)
+        val id = (db.getGoalDBCount() + 1)
+        Log.d(TAG,"id is "+ id)
         // can get a view by its id name
         newGoal = Goal(etGoalName.text.toString(),"0.0", btnPickDueDate.text.toString(),
             false, id)
@@ -79,7 +79,7 @@ class CreateNewGoalFragment : Fragment() {
             val ck = Checkpoint(et.text.toString(),d,t,false, id)
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
-            Log.d("cpList: ", "${et.text}")
+            Log.d(TAG, "${et.text}")
         }
 
         db.addGoalData(newGoal)

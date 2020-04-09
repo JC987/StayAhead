@@ -23,8 +23,10 @@ class DetailedGoalActivity : AppCompatActivity() {
     lateinit var tableLayout: TableLayout
     lateinit  var tvPercentage: TextView
     val map = mutableMapOf<Int, Int>()
-    var goalPercent = ""
+    var goalPercent:String = ""
     var goalId = -1
+    var goalDate:String = ""
+    var goalName = ""
     var numOfCheckpoint: Float = 0f
     var numChecked: Float = 0f
     var isFinished = false
@@ -39,8 +41,10 @@ class DetailedGoalActivity : AppCompatActivity() {
 
         //linearLayout = findViewById<LinearLayout>(R.id.detailedLinearLayout)
         tableLayout = findViewById<TableLayout>(R.id.detailedTableLayout)
-        tvGoalName.text = (intent.getStringExtra("goal_name"))
-        tvDueDate.text = "Due: " + intent.getStringExtra("goal_due_date")
+        goalName = intent.getStringExtra("goal_name")
+        tvGoalName.text = (goalName)
+        goalDate = intent.getStringExtra("goal_due_date")
+        tvDueDate.text = "Due: $goalDate"
         if(intent.getBooleanExtra("goal_finished", false)) {
             tvFinished.text = "Completed"
             isFinished = true
@@ -179,7 +183,10 @@ class DetailedGoalActivity : AppCompatActivity() {
         startActivity(i)
     }
     fun editGoal(){
-
+        val i = Intent(this, EditGoalActivity::class.java)
+        //i.putExtra("goal_name",goalName)
+        i.putExtra("goal_id", goalId)
+        startActivity(i)
     }
 
 
@@ -188,7 +195,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         map.forEach{
             db.updateCheckpointCompleted(it.key,it.value)
         }
-        db.updateGoalPercentage(intent.getIntExtra("goal_id",0),goalPercent)
+        db.updateGoalPercentage(goalId,goalPercent)
         super.onPause()
 
     }
