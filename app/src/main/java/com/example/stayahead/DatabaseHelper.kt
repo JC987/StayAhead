@@ -84,10 +84,25 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         return result != i.toLong()
     }
 
+    fun updateCheckpointData(checkpointId: Int, newName: String, newDate: String){
+        val db = this.writableDatabase
+        // db.rawQuery("CREATE TABLE " + GOAL_TABLE_NAME, null);
+        Log.d("TAG","col will be " + newName)
+        db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL1 = '${newName}', $CHECKPOINT_COL3 = '${newDate}' WHERE ID = ${checkpointId}")
+        //c.close()
+        //db.close()
+    }
+
     fun updateCheckpointCompleted(id:Int, value:Int){
         val db = this.writableDatabase
         db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL4 = $value WHERE ID = $id")
        // db.close()
+    }
+
+    fun updateGoalNameAndDate(goalId:Int,newGoalName:String, newGoalDate:String, newPercent:String){
+        val db = this.writableDatabase
+        db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL1 = '${newGoalName}', $GOAL_COL3 = '${newGoalDate}', $GOAL_COL2 = '${newPercent}' WHERE ID = ${goalId}")
+        // db.close()
     }
 
     fun updateGoalPercentage(id:Int, per:String){
