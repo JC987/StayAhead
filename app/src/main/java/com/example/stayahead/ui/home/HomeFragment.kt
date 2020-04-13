@@ -29,6 +29,9 @@ class HomeFragment : Fragment() {
         homeViewModel =
             ViewModelProviders.of(this).get(HomeViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_home, container, false)
+        //activity?.title = "Stay Ahead!"
+        (activity as SideNavDrawer).supportActionBar?.title = "Stay Ahead!"
+
         Log.d("TAG","home!")
         rvList = root.findViewById<RecyclerView>(R.id.rvList)
 
@@ -46,6 +49,7 @@ class HomeFragment : Fragment() {
         listItems.clear()
         Log.d("TAG", "HF:: on resume")
         val c = db.getAllGoalData(false)
+
         while(c.moveToNext()){
             //                                          goal name               percent                    date                          finished
             Log.d("TAG","       c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4))
@@ -63,10 +67,6 @@ class HomeFragment : Fragment() {
         rvList.adapter = adapter
     }
 
-    fun testDB(){
-        //val db = DatabaseHelper(root.context)
-        //db.deleteDB()
 
-    }
 
 }

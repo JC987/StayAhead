@@ -94,7 +94,7 @@ class DetailedGoalActivity : AppCompatActivity() {
             tvCheckpointName.textSize = 18f
            // tvCheckpointName.width = 200
 
-                        tvCheckpointDate.text = "Due on: \n${convertDateToStandardView(currentCheckpoint.date)}"
+                        tvCheckpointDate.text = "Due:\n${currentCheckpoint.date}"
                         tvCheckpointDate.setTextColor(Color.BLACK)
                         tvCheckpointDate.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
                         tvCheckpointDate.textSize = 18f
@@ -122,7 +122,7 @@ class DetailedGoalActivity : AppCompatActivity() {
                 }
 
                 //tvPercentage.text = ((numChecked/numOfCheckpoint) * 100).toString()
-                val df = DecimalFormat("#.##")
+                val df = DecimalFormat("#.0")
                 goalPercent = df.format(((numChecked/numOfCheckpoint) * 100))
                 tvPercentage.text = "${goalPercent} %"
             }
@@ -146,7 +146,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.detailed_goal_menu, menu)
         if(isFinished) {
             menu.findItem(R.id.action_edit_goal).isVisible = false
-            menu.findItem(R.id.action_complete).isVisible = false
+            menu.findItem(R.id.action_finish).isVisible = false
         }
         return true
     }
@@ -154,7 +154,7 @@ class DetailedGoalActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.action_complete -> finishGoal()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
+            R.id.action_finish -> finishGoal()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
             R.id.action_delete -> deleteGoal()//Toast.makeText(this,"GOAL deleted", Toast.LENGTH_LONG).show()
             R.id.action_edit_goal -> editGoal()//Toast.makeText(this,"GOAL edited", Toast.LENGTH_LONG).show()
         }
@@ -166,7 +166,7 @@ class DetailedGoalActivity : AppCompatActivity() {
             return
         db.finishGoal(goalId)
         db.close()
-
+        Toast.makeText(this,"Goal Finished",Toast.LENGTH_SHORT).show()
         val i = Intent(this, SideNavDrawer::class.java)
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(i)
@@ -175,6 +175,7 @@ class DetailedGoalActivity : AppCompatActivity() {
     fun deleteGoal(){
         if(goalId == -1)
             return
+        Toast.makeText(this,"Goal Deleted",Toast.LENGTH_SHORT).show()
         db.deleteGoal(goalId)
         db.close()
 

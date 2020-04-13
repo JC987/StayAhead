@@ -32,6 +32,7 @@ class CreateNewGoalFragment : Fragment() {
     private lateinit var cpList: ArrayList<TableRow>
     private lateinit var btnSubmit: Button
     private val TAG = "CreateNewGoalFragment:"
+    private var goalDate = ""
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,17 +42,13 @@ class CreateNewGoalFragment : Fragment() {
             ViewModelProviders.of(this).get(CreateNewGoalViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_create_new_goal, container, false)
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
-        val btnDueTime: Button = root.findViewById(R.id.btnPickDueTime)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
         val btnAddCheckpoint: Button = root.findViewById(R.id.btnAddCheckpoint)
         tvDateAndTime = root.findViewById(R.id.tvDueDate)
         layout = root.findViewById(R.id.lvCheckpoints)
         cpList = ArrayList()
 
-        btnDueTime.setOnClickListener {
-            timePickerDialog(btnDueTime)
-            //btnDueTime.text = str
-        }
+
         btnDueDate.setOnClickListener {
             datePickerDialog(btnDueDate)
         }
@@ -70,13 +67,14 @@ class CreateNewGoalFragment : Fragment() {
         val id = (db.getGoalDBCount() + 1)
         Log.d(TAG,"id is "+ id)
         // can get a view by its id name
-        newGoal = Goal(etGoalName.text.toString(),"0.0", btnPickDueDate.text.toString(),
+
+
+        newGoal = Goal(etGoalName.text.toString(),"0.0", goalDate,
             false, id)
         for (i:Int in 0 until cpList.size){
             val et =  cpList.get(i).getChildAt(0) as EditText
             val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
-            val t = (cpList.get(i).getChildAt(2) as Button).text.toString()
-            val ck = Checkpoint(et.text.toString(),d,t,false, id)
+            val ck = Checkpoint(et.text.toString(),d,"time",false, id)
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
             Log.d(TAG, "${et.text}")
@@ -87,8 +85,6 @@ class CreateNewGoalFragment : Fragment() {
     }
 
 
-
-    //TODO: Create dialog boxes for remove item and picking date and time
     fun removeItemDialog(tr: TableRow){
         val dialog = AlertDialog.Builder(root.context)
         dialog.setTitle("Delete Checkpoint")
@@ -103,47 +99,34 @@ class CreateNewGoalFragment : Fragment() {
         dialog.setNegativeButton("No", DialogInterface.OnClickListener { dialogInterface, i ->
             Toast.makeText(root.context,"Canceled!",Toast.LENGTH_SHORT).show()
         })
-        //?dialog.create()
         dialog.show()
 
     }
 
-    fun timePickerDialog(btn:Button){
-        val view = View.inflate(root.context,R.layout.dialog_timepicker, null)
-        val tp = view.findViewById<TimePicker>(R.id.timePicker)
-
-        val dialog = AlertDialog.Builder(root.context)
-        dialog.setView(view)
-        dialog.setTitle("TimePicker!")
-        dialog.setPositiveButton("Confirm"
-        ) { _:DialogInterface, _:Int ->
-            btn.text = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                "${tp.hour}:${tp.minute}"
-            else
-                "${tp.currentHour}:${tp.currentMinute}"
-
-        }
-        val tmp = tvDateAndTime.text.toString() + btn.text.toString()
-        tvDateAndTime.text = tmp
-        dialog.create()
-        dialog.show()
-
-    }
     fun datePickerDialog(btn:Button){
         val view = View.inflate(root.context,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
-
+        var tmpDate =""
         val dialog = AlertDialog.Builder(root.context)
         dialog.setView(view)
-        dialog.setTitle("TimePicker!")
+        dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
         ) { _:DialogInterface, _:Int ->
-            btn.text = "${dp.year}${dp.month}${dp.dayOfMonth}"
+            if((dp.month + 1)<10)
+                tmpDate = "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
+            else
+                tmpDate = "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
 
+            if(btn.id == R.id.btnPickDueDate){
+                goalDate = tmpDate
+                val tmp = "Due Date is: " + goalDate
+                tvDateAndTime.text = tmp
+            }
+            else
+                btn.text = tmpDate
         }
 
-        val tmp = tvDateAndTime.text.toString() + btn.text.toString()
-        tvDateAndTime.text = tmp
+
         dialog.create()
         dialog.show()
 
@@ -159,10 +142,7 @@ class CreateNewGoalFragment : Fragment() {
         val btnDateCk = Button(root.context)
         val btnParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f);
 
-        val btnTimeCk = Button(root.context)
-        btnTimeCk.setOnClickListener {
-            timePickerDialog(btnTimeCk)
-        }
+
         btnDateCk.setOnClickListener {
             datePickerDialog(btnDateCk)
         }
@@ -170,10 +150,8 @@ class CreateNewGoalFragment : Fragment() {
         tableRow.layoutParams = trParams
 
         btnDateCk.text = "Date"
-        btnTimeCk.text = "Time"
 
         btnDateCk.layoutParams = btnParams
-        btnTimeCk.layoutParams = btnParams
 
         editText.layoutParams = etParams
         editText.hint = "Enter a checkpoint!"
@@ -181,8 +159,6 @@ class CreateNewGoalFragment : Fragment() {
 
         tableRow.addView(editText)
         tableRow.addView(btnDateCk)
-        tableRow.addView(btnTimeCk)
-
         layout.addView(tableRow)
 
         editText.setOnLongClickListener {

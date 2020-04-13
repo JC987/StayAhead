@@ -8,7 +8,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_edit_goal">Edit Goal</string>
     <string name="action_delete">Delete This Goal</string>
-    <string name="action_complete">Complete Goal</string>
+    <string name="action_finish">Finish Goal</string>
 
     <string name="menu_home">Home</string>
     <string name="menu_previous_goal">Previous Goals</string>

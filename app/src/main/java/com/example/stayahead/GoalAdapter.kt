@@ -29,11 +29,11 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
             val tvGoalName = itemView.findViewById(R.id.goalListText1) as TextView
             val tvRemainingPercent  = itemView.findViewById(R.id.goalListText2) as TextView
             tvGoalName.text = goal.goalName
-            tvRemainingPercent.text = goal.remainingPercentage
+            tvRemainingPercent.text = goal.remainingPercentage + "%"
 
             itemView.setOnClickListener{
 
-                Toast.makeText(itemView.context,"item pressed "+ goal.goalName + "  " + goal.goalId,Toast.LENGTH_SHORT).show()
+                //Toast.makeText(itemView.context,"item pressed "+ goal.goalName + "  " + goal.goalId,Toast.LENGTH_SHORT).show()
                 val intent = Intent(itemView.context,DetailedGoalActivity::class.java)
 
                 //TODO: REMOVE THESE EXTRAS EXCEPT GOAL ID

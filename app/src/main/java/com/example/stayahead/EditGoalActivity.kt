@@ -22,6 +22,7 @@ class EditGoalActivity : AppCompatActivity() {
     val mapOld = mutableMapOf<Int, TableRow>()
     private  var newList: ArrayList<TableRow> = ArrayList()
     private lateinit var etGoalName: EditText
+    private lateinit var tvGoalDate: TextView
     var date = ""
     var totalCheckpoints:Float = 0f
     var totalCheckpointsCompleted:Float = 0f
@@ -31,7 +32,7 @@ class EditGoalActivity : AppCompatActivity() {
         goalId = intent.getIntExtra("goal_id",1)
         val db = DatabaseHelper(this)
         etGoalName = findViewById<EditText>(R.id.etGoalName)
-        val tvGoalDate = findViewById<TextView>(R.id.tvDueDate)
+        tvGoalDate = findViewById<TextView>(R.id.tvDueDate)
         val btnDate = findViewById<Button>(R.id.btnPickDueDate)
         val btnAddCheckpoint = findViewById<Button>(R.id.btnAddCheckpoint)
          tableLayout = findViewById<TableLayout>(R.id.lvCheckpoints)
@@ -43,7 +44,7 @@ class EditGoalActivity : AppCompatActivity() {
         Log.d("TAG",c.getString(1))
         etGoalName.setText(c.getString(1))
         date = c.getString(3)
-        tvGoalDate.text = date
+        tvGoalDate.text = "Due date is: " + date
         val c2 = db.getAllCheckpointsOfGoal(goalId)
         while(c2.moveToNext()){
 
@@ -147,40 +148,28 @@ class EditGoalActivity : AppCompatActivity() {
 
     }
 */
-    fun timePickerDialog(btn:Button){
-        val view = View.inflate(this,R.layout.dialog_timepicker, null)
-        val tp = view.findViewById<TimePicker>(R.id.timePicker)
 
-        val dialog = AlertDialog.Builder(this)
-        dialog.setView(view)
-        dialog.setTitle("TimePicker!")
-        dialog.setPositiveButton("Confirm"
-        ) { _: DialogInterface, _:Int ->
-            btn.text = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                "${tp.hour}:${tp.minute}"
-            else
-                "${tp.currentHour}:${tp.currentMinute}"
-
-        }
-        dialog.create()
-        dialog.show()
-
-    }
     fun datePickerDialog(btn:Button){
         val view = View.inflate(this,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
 
         val dialog = AlertDialog.Builder(this)
-        var tmp = ""
+
         dialog.setView(view)
-        dialog.setTitle("TimePicker!")
+        dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
         ) { _: DialogInterface, _:Int ->
-            btn.text =  "${dp.year}${dp.month}${dp.dayOfMonth}"
+            if((dp.month + 1)<10)
+                date = "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
+            else
+                date = "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
 
-        }
-        if(btn.id == R.id.btnPickDueDate){
-            date = tmp
+            if(btn.id == R.id.btnPickDueDate){
+                val tmp = "Due Date is: " + date
+                tvGoalDate.text = tmp
+            }
+            else
+                btn.text = date
         }
         dialog.create()
         dialog.show()
@@ -209,12 +198,13 @@ class EditGoalActivity : AppCompatActivity() {
             db.updateCheckpointData(id,updatedName,updatedDate)
         }
 
-        val df = DecimalFormat("#.##")
+        val df = DecimalFormat("0.0")
         val newPercent = (df.format(((totalCheckpointsCompleted/totalCheckpoints) * 100))).toString()
         Log.d("TAG!", "nP " + newPercent + " " + totalCheckpoints + " " + totalCheckpointsCompleted)
         db.updateGoalNameAndDate(goalId,etGoalName.text.toString(), date, newPercent)
 
 
+        Toast.makeText(this,"Goal Edited",Toast.LENGTH_SHORT).show()
         val i = Intent(this, SideNavDrawer::class.java)
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(i)
