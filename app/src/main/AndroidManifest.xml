@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".EditGoalActivity"></activity>
+        <receiver android:name="com.example.stayahead.AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
         <activity
             android:name=".SideNavDrawer"
             android:theme="@style/AppTheme.NoActionBar">
@@ -21,6 +24,7 @@
         </activity>
         <activity android:name=".DetailedGoalActivity" />
         <activity android:name=".MainActivity"></activity>
+
     </application>
 
 </manifest>

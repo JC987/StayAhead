@@ -1,7 +1,11 @@
 package com.example.stayahead.ui.createNewGoal
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,13 +18,12 @@ import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.stayahead.Checkpoint
-import com.example.stayahead.DatabaseHelper
-import com.example.stayahead.Goal
-import com.example.stayahead.R
+import com.example.stayahead.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_create_new_goal.*
 import java.sql.Time
+import java.util.*
+import kotlin.collections.ArrayList
 
 class CreateNewGoalFragment : Fragment() {
 
@@ -31,6 +34,7 @@ class CreateNewGoalFragment : Fragment() {
     private lateinit var newGoal: Goal
     private lateinit var cpList: ArrayList<TableRow>
     private lateinit var btnSubmit: Button
+    val datetimeToAlarm = Calendar.getInstance(Locale.getDefault())
     private val TAG = "CreateNewGoalFragment:"
     private var goalDate = ""
     override fun onCreateView(
@@ -73,12 +77,27 @@ class CreateNewGoalFragment : Fragment() {
             false, id)
         for (i:Int in 0 until cpList.size){
             val et =  cpList.get(i).getChildAt(0) as EditText
-            val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
+            var d = (cpList.get(i).getChildAt(1) as Button).text.toString()
+
             val ck = Checkpoint(et.text.toString(),d,"time",false, id)
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
             Log.d(TAG, "${et.text}")
         }
+
+        val notifyIntent = Intent(root.context, AlarmReceiver::class.java)
+        notifyIntent.putExtra("goal_name",newGoal.goalName)
+        notifyIntent.putExtra("type","goal")
+        val pendingIntent = PendingIntent.getBroadcast(root.context, PendingIntent.FLAG_ONE_SHOT,
+            notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+
+        val am = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        Log.d("NotificationHelper",":" + datetimeToAlarm.timeInMillis)
+        Log.d("NotificationHelper",":::" + System.currentTimeMillis())
+        am.setExact(AlarmManager.RTC_WAKEUP,datetimeToAlarm.timeInMillis, pendingIntent)
+
 
         db.addGoalData(newGoal)
         parentFragmentManager.popBackStack()
@@ -107,23 +126,49 @@ class CreateNewGoalFragment : Fragment() {
         val view = View.inflate(root.context,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
         var tmpDate =""
+        var tmpDateMilli = 0
         val dialog = AlertDialog.Builder(root.context)
+      //  dp.minDate = 0
+        val d = Date()
+        dp.minDate = d.time
+        Toast.makeText(root.context,"min is " + dp.minDate + " : " + d, Toast.LENGTH_SHORT).show()
         dialog.setView(view)
         dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
         ) { _:DialogInterface, _:Int ->
-            if((dp.month + 1)<10)
+            if((dp.month + 1)<10) {
                 tmpDate = "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
-            else
+
+
+
+            }
+            else {
                 tmpDate = "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
+            }
 
             if(btn.id == R.id.btnPickDueDate){
+
+                datetimeToAlarm.set(Calendar.YEAR, dp.year)
+                datetimeToAlarm.set(Calendar.MONTH, dp.month)
+                datetimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
+                datetimeToAlarm.set(Calendar.HOUR_OF_DAY, 19)
+                datetimeToAlarm.set(Calendar.MINUTE, 19)
+                datetimeToAlarm.set(Calendar.SECOND, 0)
+
                 goalDate = tmpDate
                 val tmp = "Due Date is: " + goalDate
                 tvDateAndTime.text = tmp
             }
-            else
-                btn.text = tmpDate
+            else {
+
+                if(goalDate < tmpDate){
+                    Toast.makeText(root.context,"Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
+                    btn.text = goalDate
+                }
+                else
+                    btn.text = tmpDate
+            }
+
         }
 
 

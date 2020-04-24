@@ -23,7 +23,7 @@ class EditGoalActivity : AppCompatActivity() {
     private  var newList: ArrayList<TableRow> = ArrayList()
     private lateinit var etGoalName: EditText
     private lateinit var tvGoalDate: TextView
-    var date = ""
+    var goalDate = ""
     var totalCheckpoints:Float = 0f
     var totalCheckpointsCompleted:Float = 0f
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +43,8 @@ class EditGoalActivity : AppCompatActivity() {
         Log.d("TAG","count is " + c.count)
         Log.d("TAG",c.getString(1))
         etGoalName.setText(c.getString(1))
-        date = c.getString(3)
-        tvGoalDate.text = "Due date is: " + date
+        goalDate = c.getString(3)
+        tvGoalDate.text = "Due date is: " + goalDate
         val c2 = db.getAllCheckpointsOfGoal(goalId)
         while(c2.moveToNext()){
 
@@ -128,7 +128,6 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
 
-    //TODO: Create dialog boxes for remove item and picking date and time
   /*  fun removeItemDialog(tr: TableRow){
         val dialog = AlertDialog.Builder(this)
         dialog.setTitle("Delete Checkpoint")
@@ -159,17 +158,23 @@ class EditGoalActivity : AppCompatActivity() {
         dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
         ) { _: DialogInterface, _:Int ->
-            if((dp.month + 1)<10)
-                date = "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
+           var tmpDate =  if((dp.month + 1)<10)
+                "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
             else
-                date = "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
+                 "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
 
             if(btn.id == R.id.btnPickDueDate){
-                val tmp = "Due Date is: " + date
+                goalDate = tmpDate
+                val tmp = "Due Date is: " + goalDate
                 tvGoalDate.text = tmp
             }
             else
-                btn.text = date
+                if(goalDate < tmpDate){
+                    Toast.makeText(this,"Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
+                    btn.text = goalDate
+                }
+                else
+                    btn.text = tmpDate
         }
         dialog.create()
         dialog.show()
@@ -201,7 +206,7 @@ class EditGoalActivity : AppCompatActivity() {
         val df = DecimalFormat("0.0")
         val newPercent = (df.format(((totalCheckpointsCompleted/totalCheckpoints) * 100))).toString()
         Log.d("TAG!", "nP " + newPercent + " " + totalCheckpoints + " " + totalCheckpointsCompleted)
-        db.updateGoalNameAndDate(goalId,etGoalName.text.toString(), date, newPercent)
+        db.updateGoalNameAndDate(goalId,etGoalName.text.toString(), goalDate, newPercent)
 
 
         Toast.makeText(this,"Goal Edited",Toast.LENGTH_SHORT).show()

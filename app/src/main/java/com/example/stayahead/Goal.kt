@@ -21,12 +21,8 @@ class Goal(var goalName: String, var remainingPercentage: String, var date: Stri
     }
     
     fun getDateAsString(): String{
-        if(date == "")
-            return getDefDateString()
         return date
     }
 
-    fun getDefDateString() : String{
-       return "02/28/2020"
-   }
+
 }

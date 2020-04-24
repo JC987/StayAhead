@@ -1,6 +1,7 @@
 package com.example.stayahead
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -29,7 +30,7 @@ class SideNavDrawer : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_previous_goal, R.id.nav_settings,
-                R.id.nav_create_goal, R.id.nav_share, R.id.nav_send
+                R.id.nav_create_goal
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -39,6 +40,7 @@ class SideNavDrawer : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
     }
+
 
 
 
