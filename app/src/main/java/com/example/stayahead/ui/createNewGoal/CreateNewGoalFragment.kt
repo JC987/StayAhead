@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_create_new_goal.*
 import java.sql.Time
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.random.Random.Default.nextInt
 
 class CreateNewGoalFragment : Fragment() {
 
@@ -34,7 +36,10 @@ class CreateNewGoalFragment : Fragment() {
     private lateinit var newGoal: Goal
     private lateinit var cpList: ArrayList<TableRow>
     private lateinit var btnSubmit: Button
-    val datetimeToAlarm = Calendar.getInstance(Locale.getDefault())
+    private lateinit var sharedPreferences: SharedPreferences
+    private var hour:Int = 0
+    private var minute:Int = 0
+    val goalDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
     private val TAG = "CreateNewGoalFragment:"
     private var goalDate = ""
     override fun onCreateView(
@@ -45,6 +50,9 @@ class CreateNewGoalFragment : Fragment() {
         toolsViewModel =
             ViewModelProviders.of(this).get(CreateNewGoalViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_create_new_goal, container, false)
+        sharedPreferences = root.context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        hour = sharedPreferences.getInt("notification_time_hour",9)
+        minute = sharedPreferences.getInt("notification_time_minute",0)
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
         val btnAddCheckpoint: Button = root.findViewById(R.id.btnAddCheckpoint)
@@ -77,34 +85,52 @@ class CreateNewGoalFragment : Fragment() {
             false, id)
         for (i:Int in 0 until cpList.size){
             val et =  cpList.get(i).getChildAt(0) as EditText
-            var d = (cpList.get(i).getChildAt(1) as Button).text.toString()
+            val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
+            val ck = Checkpoint(et.text.toString(),d,"time",false, id,db.getCheckpointDBCount()+1)
 
-            val ck = Checkpoint(et.text.toString(),d,"time",false, id)
+            val cpTime = getCheckpointTimeInMillis(d)
+            createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
+
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
             Log.d(TAG, "${et.text}")
         }
 
-        val notifyIntent = Intent(root.context, AlarmReceiver::class.java)
-        notifyIntent.putExtra("goal_name",newGoal.goalName)
-        notifyIntent.putExtra("type","goal")
-        val pendingIntent = PendingIntent.getBroadcast(root.context, PendingIntent.FLAG_ONE_SHOT,
-            notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-
-        val am = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        Log.d("NotificationHelper",":" + datetimeToAlarm.timeInMillis)
-        Log.d("NotificationHelper",":::" + System.currentTimeMillis())
-        am.setExact(AlarmManager.RTC_WAKEUP,datetimeToAlarm.timeInMillis, pendingIntent)
-
+        createAlarmManager(newGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
 
         db.addGoalData(newGoal)
         parentFragmentManager.popBackStack()
     }
 
+    private fun getCheckpointTimeInMillis(checkpointDate:String):Long{
+        var sp = checkpointDate.split("-")
+        val cpDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
+        cpDateTimeToAlarm.set(Calendar.YEAR, sp[0].toInt())
+        cpDateTimeToAlarm.set(Calendar.MONTH, (sp[1].toInt() -1) )
+        cpDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, sp[2].toInt())
+        cpDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, hour)
+        cpDateTimeToAlarm.set(Calendar.MINUTE, minute)
+        cpDateTimeToAlarm.set(Calendar.SECOND, 0)
+        return cpDateTimeToAlarm.timeInMillis
+    }
 
-    fun removeItemDialog(tr: TableRow){
+    private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
+        val pendingIntent = createPendingIntent(resultCode,typeValue)
+        val am = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        am.setExact(AlarmManager.RTC_WAKEUP,time, pendingIntent)
+
+    }
+    private fun createPendingIntent(resultCode:Int, typeValue:String) : PendingIntent{
+        val notifyIntent = Intent(root.context, AlarmReceiver::class.java)
+        notifyIntent.putExtra("goal_name",newGoal.goalName)
+        notifyIntent.putExtra("type",typeValue)
+        notifyIntent.putExtra("code",resultCode)
+        return PendingIntent.getBroadcast(root.context, resultCode,
+            notifyIntent, PendingIntent.FLAG_ONE_SHOT)
+    }
+
+    private fun removeItemDialog(tr: TableRow){
         val dialog = AlertDialog.Builder(root.context)
         dialog.setTitle("Delete Checkpoint")
         dialog.setMessage("Do you want to delete this checkpoint")
@@ -122,7 +148,7 @@ class CreateNewGoalFragment : Fragment() {
 
     }
 
-    fun datePickerDialog(btn:Button){
+    private fun datePickerDialog(btn:Button){
         val view = View.inflate(root.context,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
         var tmpDate =""
@@ -139,8 +165,6 @@ class CreateNewGoalFragment : Fragment() {
             if((dp.month + 1)<10) {
                 tmpDate = "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
 
-
-
             }
             else {
                 tmpDate = "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
@@ -148,12 +172,12 @@ class CreateNewGoalFragment : Fragment() {
 
             if(btn.id == R.id.btnPickDueDate){
 
-                datetimeToAlarm.set(Calendar.YEAR, dp.year)
-                datetimeToAlarm.set(Calendar.MONTH, dp.month)
-                datetimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
-                datetimeToAlarm.set(Calendar.HOUR_OF_DAY, 19)
-                datetimeToAlarm.set(Calendar.MINUTE, 19)
-                datetimeToAlarm.set(Calendar.SECOND, 0)
+                goalDateTimeToAlarm.set(Calendar.YEAR, dp.year)
+                goalDateTimeToAlarm.set(Calendar.MONTH, dp.month)
+                goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
+                goalDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, hour)
+                goalDateTimeToAlarm.set(Calendar.MINUTE, minute)
+                goalDateTimeToAlarm.set(Calendar.SECOND, 0)
 
                 goalDate = tmpDate
                 val tmp = "Due Date is: " + goalDate
@@ -177,7 +201,7 @@ class CreateNewGoalFragment : Fragment() {
 
     }
 
-    fun createCheckpoint(){
+    private fun createCheckpoint(){
         val tableRow = TableRow(root.context)
         val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT)
 

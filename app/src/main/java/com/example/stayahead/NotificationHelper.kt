@@ -38,8 +38,9 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         return manager
     }
 
-    fun createGoalReminderNotification(title:String?):NotificationCompat.Builder{
+    fun createGoalReminderNotification(title:String?, code:Int):NotificationCompat.Builder{
         val notificationBuilder = NotificationCompat.Builder(applicationContext,CHANNEL_NAME_GOALS_ID)
+
         notificationBuilder.setSmallIcon(R.drawable.ic_launcher_foreground)
         notificationBuilder.setContentText("You have a goal due today")
         notificationBuilder.setContentTitle("$title is due today")
@@ -49,9 +50,9 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         val notificationIntent = Intent(this, SideNavDrawer::class.java)
         val contentIntent = PendingIntent.getActivity(
             this,
-            0,
+            code,
             notificationIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_ONE_SHOT
         )
 
         notificationBuilder.setContentIntent(contentIntent)
@@ -60,20 +61,20 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         return notificationBuilder
     }
 
-    fun createCheckpointReminderNotification(title: String?):NotificationCompat.Builder {
-        val notificationBuilder = NotificationCompat.Builder(applicationContext,CHANNEL_NAME_GOALS_ID)
+    fun createCheckpointReminderNotification(title: String?, code: Int):NotificationCompat.Builder {
+        val notificationBuilder = NotificationCompat.Builder(applicationContext,CHANNEL_NAME_CHECKPOINTS_ID)
         notificationBuilder.setSmallIcon(R.drawable.ic_launcher_foreground)
         notificationBuilder.setContentText("You have a checkpoint due today")
-        notificationBuilder.setContentTitle("You'r checkpoint for $title is due today")
+        notificationBuilder.setContentTitle("Your checkpoint for $title is due today")
         notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
         Log.d("NotificationHelper","create goal notification")
         val notificationIntent = Intent(this, SideNavDrawer::class.java)
         val contentIntent = PendingIntent.getActivity(
             this,
-            0,
+            code,
             notificationIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_ONE_SHOT
         )
 
         notificationBuilder.setContentIntent(contentIntent)

@@ -70,6 +70,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
             return 0
         return c.getInt(0)
     }
+    fun getCheckpointDBCount(): Int{
+        val db = this.writableDatabase
+        val c = db.rawQuery("SELECT seq FROM SQLITE_SEQUENCE WHERE name = '$CHECKPOINT_TABLE_NAME'",null)
+        c.moveToFirst()
+        //var count = 0
+        if(c.count == 0)
+            return 0
+        return c.getInt(0)
+    }
     fun getCheckpointsForGoal(id: Int): Cursor{
         val db = this.writableDatabase
         val c = db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $id",null)
