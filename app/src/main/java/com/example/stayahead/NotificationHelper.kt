@@ -65,7 +65,7 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         return notificationBuilder
     }
 
-    fun createCheckpointReminderNotification(title: String?, code: Int):NotificationCompat.Builder {
+    fun createCheckpointReminderNotification(title: String?, code: Int, goalId: Int):NotificationCompat.Builder {
         val notificationBuilder = NotificationCompat.Builder(applicationContext,CHANNEL_NAME_CHECKPOINTS_ID)
         notificationBuilder.setSmallIcon(R.drawable.ic_date_range_black_24dp)
 
@@ -74,14 +74,17 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
         Log.d("NotificationHelper","create goal notification")
-        val notificationIntent = Intent(this, SideNavDrawer::class.java)
+        val notificationIntent = Intent(this, DetailedGoalActivity::class.java)
+        notificationIntent.putExtra("is_notification",1)
+        notificationIntent.putExtra("is_checkpoint",1)
+        notificationIntent.putExtra("goal_id", goalId)
+        notificationIntent.putExtra("checkpoint_id", code)
         val contentIntent = PendingIntent.getActivity(
             this,
-            code,
+            code + 100000,
             notificationIntent,
             PendingIntent.FLAG_ONE_SHOT
         )
-
         notificationBuilder.setContentIntent(contentIntent)
 
         return notificationBuilder

@@ -126,6 +126,7 @@ class CreateNewGoalFragment : Fragment() {
         notifyIntent.putExtra("goal_name",newGoal.goalName)
         notifyIntent.putExtra("type",typeValue)
         notifyIntent.putExtra("code",resultCode)
+        notifyIntent.putExtra("goal_id", newGoal.goalId)
         return PendingIntent.getBroadcast(root.context, resultCode,
             notifyIntent, PendingIntent.FLAG_ONE_SHOT)
     }

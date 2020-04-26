@@ -43,6 +43,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         goalId = intent.getIntExtra("goal_id",-1)
 
         if(intent.getIntExtra("is_notification",0) == 0){
+            Log.d("NotificationHelper"," shouldnt be a notificaion")
             goalName = intent.getStringExtra("goal_name")
             goalDate = intent.getStringExtra("goal_due_date")
             goalPercent = intent.getStringExtra("goal_percent")
@@ -55,8 +56,14 @@ class DetailedGoalActivity : AppCompatActivity() {
             goalPercent = goalC.getString(2)
 
             //clear that notification
-            val nh = NotificationHelper(this)
-            nh.cancelNotification(goalId)
+            if(intent.getIntExtra("is_checkpoint",0) == 0) {
+                val nh = NotificationHelper(this)
+                nh.cancelNotification(goalId)
+            }
+            else{
+                val nh = NotificationHelper(this)
+                nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
+            }
         }
         //linearLayout = findViewById<LinearLayout>(R.id.detailedLinearLayout)
         tableLayout = findViewById<TableLayout>(R.id.detailedTableLayout)

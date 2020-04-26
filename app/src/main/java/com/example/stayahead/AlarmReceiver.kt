@@ -17,8 +17,8 @@ class AlarmReceiver : BroadcastReceiver() {
         }else {
             Log.d("NotificationHelper", "type = checkpoint")
             n.getManager().notify(
-                p1!!.getIntExtra("code",0),
-                n.createCheckpointReminderNotification(p1.getStringExtra("goal_name"),p1.getIntExtra("code",0)).build()
+                p1!!.getIntExtra("code",0) + 100000,
+                n.createCheckpointReminderNotification(p1.getStringExtra("goal_name"),p1.getIntExtra("code",0),p1.getIntExtra("goal_id",0)).build()
             )
         }
     }
