@@ -208,7 +208,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         Log.d("TAG", "truncate tables")
     }
 
-    companion object {
+    private companion object {
         const val GOAL_TABLE_NAME = "Goals"
         const val GOAL_COL1 = "Name"
         const val GOAL_COL2 = "Percentage"

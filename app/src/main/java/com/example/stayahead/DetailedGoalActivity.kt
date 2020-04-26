@@ -2,6 +2,7 @@ package com.example.stayahead
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -39,11 +40,29 @@ class DetailedGoalActivity : AppCompatActivity() {
         val tvFinished = findViewById<TextView>(R.id.tvFinishedDetailed)
         tvPercentage = findViewById<TextView>(R.id.tvPercentageDetailed)
 
+        goalId = intent.getIntExtra("goal_id",-1)
+
+        if(intent.getIntExtra("is_notification",0) == 0){
+            goalName = intent.getStringExtra("goal_name")
+            goalDate = intent.getStringExtra("goal_due_date")
+            goalPercent = intent.getStringExtra("goal_percent")
+        }
+        else{
+            val goalC = db.getGoal(goalId)
+            goalC.moveToFirst()
+            goalName = goalC.getString(1)
+            goalDate = goalC.getString(3)
+            goalPercent = goalC.getString(2)
+
+            //clear that notification
+            val nh = NotificationHelper(this)
+            nh.cancelNotification(goalId)
+        }
         //linearLayout = findViewById<LinearLayout>(R.id.detailedLinearLayout)
         tableLayout = findViewById<TableLayout>(R.id.detailedTableLayout)
-        goalName = intent.getStringExtra("goal_name")
+       // goalName = intent.getStringExtra("goal_name")
         tvGoalName.text = (goalName)
-        goalDate = intent.getStringExtra("goal_due_date")
+        //goalDate = intent.getStringExtra("goal_due_date")
         tvDueDate.text = "Due: $goalDate"
         if(intent.getBooleanExtra("goal_finished", false)) {
             tvFinished.text = "Completed"
@@ -52,9 +71,8 @@ class DetailedGoalActivity : AppCompatActivity() {
         else
             tvFinished.text = "Ongoing"
 
-        goalPercent = intent.getStringExtra("goal_percent")
+        //goalPercent = intent.getStringExtra("goal_percent")
         tvPercentage.text = "$goalPercent %"
-        goalId = intent.getIntExtra("goal_id",-1)
 
 
         createCheckpoints()
@@ -202,6 +220,11 @@ class DetailedGoalActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if(intent.getIntExtra("is_notification",0) == 1) {
+            val i = Intent(this, SideNavDrawer::class.java)
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(i)
+        }
         super.onBackPressed()
     }
 
