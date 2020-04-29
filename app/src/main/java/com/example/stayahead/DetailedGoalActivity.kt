@@ -2,7 +2,9 @@ package com.example.stayahead
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -197,7 +199,28 @@ class DetailedGoalActivity : AppCompatActivity() {
         startActivity(i)
     }
 
+    private fun createPendingIntent(resultCode:Int, type:String) : PendingIntent {
+        val notifyIntent = Intent(this, AlarmReceiver::class.java)
+        notifyIntent.putExtra("goal_name",goalName)
+        notifyIntent.putExtra("type",type)
+        notifyIntent.putExtra("code",resultCode)
+        notifyIntent.putExtra("goal_id", goalId)
+        return  PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+     }
+
     fun deleteGoal(){
+        val pendingIntent = createPendingIntent(goalId, "goal")
+        val am = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        am.cancel(pendingIntent)
+
+        map.forEach {
+
+            val pendingIntent2 = createPendingIntent(it.key,"checkpoint")
+            val am2 = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            am2.cancel(pendingIntent2)
+        }
+
         if(goalId == -1)
             return
         Toast.makeText(this,"Goal Deleted",Toast.LENGTH_SHORT).show()
