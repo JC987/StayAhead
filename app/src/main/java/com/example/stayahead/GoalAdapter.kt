@@ -33,10 +33,8 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
 
             itemView.setOnClickListener{
 
-                //Toast.makeText(itemView.context,"item pressed "+ goal.goalName + "  " + goal.goalId,Toast.LENGTH_SHORT).show()
                 val intent = Intent(itemView.context,DetailedGoalActivity::class.java)
 
-                //TODO: REMOVE THESE EXTRAS EXCEPT GOAL ID
                 intent.putExtra("goal_name",goal.goalName)
                 intent.putExtra("goal_due_date", goal.getDateAsString())
                 intent.putExtra("goal_checkpoints",goal.getList())

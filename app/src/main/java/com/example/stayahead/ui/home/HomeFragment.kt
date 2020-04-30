@@ -27,6 +27,7 @@ class HomeFragment : Fragment() {
     private lateinit var rvList :RecyclerView
     private lateinit var sharedPreferences:SharedPreferences
     var listItems = ArrayList<Goal>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,8 +36,10 @@ class HomeFragment : Fragment() {
         homeViewModel =
             ViewModelProviders.of(this).get(HomeViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_home, container, false)
-        //activity?.title = "Stay Ahead!"
+
+        //set action bar title
         (activity as SideNavDrawer).supportActionBar?.title = "Stay Ahead!"
+        //allows for option menu
         setHasOptionsMenu(true)
         sharedPreferences = root.context.getSharedPreferences("settings",Context.MODE_PRIVATE)
         Log.d("TAG","home!")
@@ -71,31 +74,28 @@ class HomeFragment : Fragment() {
         resetList(getKey)
     }
 
-    private fun resetList(key:Int) {
+    private fun resetList(sortKey:Int) {
         listItems.clear()
         Log.d("TAG", "HF:: on resume")
-        lateinit var c:Cursor
-        when(key){
-            0 -> c = db.getAllGoalData(false)
-            1 -> c = db.getAllGoalData(true)
-            2 -> c = db.getAllGoalDataByDate()
+        lateinit var cursor:Cursor
+        when(sortKey){
+            0 -> cursor = db.getAllGoalData(false)
+            1 -> cursor = db.getAllGoalData(true)
+            2 -> cursor = db.getAllGoalDataByDate()
         }
-
-
-
 
         val editor:SharedPreferences.Editor = sharedPreferences.edit()
-        editor.putInt("home_sort_key",key)
+        editor.putInt("home_sort_key",sortKey)
         editor.apply()
 
-        while(c.moveToNext()){
+        while(cursor.moveToNext()){
             //                                          goal name               percent                    date                          finished
-            Log.d("TAG","       c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4) + " : key is "+ key)
-            val bool = c.getInt(4) > 0
-            val newGoal = Goal(c.getString(1),c.getString(2), c.getString(3), bool, c.getInt(0))
+            Log.d("TAG","       c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4) + " : key is "+ sortKey)
+            val bool = cursor.getInt(4) > 0
+            val newGoal = Goal(cursor.getString(1),cursor.getString(2), cursor.getString(3), bool, cursor.getInt(0))
             listItems.add(newGoal)
         }
-        if(c.count < 1){
+        if(cursor.count < 1){
             val tvHomeFragment = root.findViewById<TextView>(R.id.tvHomeFragment)
             tvHomeFragment.visibility = View.VISIBLE
         }

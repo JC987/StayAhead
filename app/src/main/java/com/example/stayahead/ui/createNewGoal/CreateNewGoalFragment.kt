@@ -153,9 +153,7 @@ class CreateNewGoalFragment : Fragment() {
         val view = View.inflate(root.context,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
         var tmpDate =""
-        var tmpDateMilli = 0
         val dialog = AlertDialog.Builder(root.context)
-      //  dp.minDate = 0
         val d = Date()
         dp.minDate = d.time
         Toast.makeText(root.context,"min is " + dp.minDate + " : " + d, Toast.LENGTH_SHORT).show()
@@ -163,12 +161,10 @@ class CreateNewGoalFragment : Fragment() {
         dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
         ) { _:DialogInterface, _:Int ->
-            if((dp.month + 1)<10) {
-                tmpDate = "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
-
-            }
-            else {
-                tmpDate = "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
+            tmpDate = if((dp.month + 1)<10) {
+                "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
+            } else {
+                "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
             }
 
             if(btn.id == R.id.btnPickDueDate){

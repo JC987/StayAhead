@@ -6,19 +6,21 @@ import android.content.Intent
 import android.util.Log
 
 class AlarmReceiver : BroadcastReceiver() {
+    val TAG:String = "AlarmReceiver"
     override fun onReceive(p0: Context?, p1: Intent?) {
-        Log.d("NotificationHelper", "receiver")
-        val n = NotificationHelper(p0!!)
+        Log.d(TAG, "received")
+        val notificationHelper = NotificationHelper(p0!!)
 
         if(p1?.getStringExtra("type") == "goal") {
-            Log.d("NotificationHelper", "type = goal")
-            n.getManager()
-                .notify(p1.getIntExtra("code",0), n.createGoalReminderNotification(p1.getStringExtra("goal_name"),p1.getIntExtra("code",0)).build())
+            Log.d(TAG, "type = goal")
+            notificationHelper.getManager()
+                .notify(p1.getIntExtra("code",0), notificationHelper.createGoalReminderNotification(
+                    p1.getStringExtra("goal_name"),p1.getIntExtra("code",0)).build())
         }else {
-            Log.d("NotificationHelper", "type = checkpoint")
-            n.getManager().notify(
-                p1!!.getIntExtra("code",0) + 100000,
-                n.createCheckpointReminderNotification(p1.getStringExtra("goal_name"),p1.getIntExtra("code",0),p1.getIntExtra("goal_id",0)).build()
+            Log.d(TAG, "type = checkpoint")
+            notificationHelper.getManager().notify(p1!!.getIntExtra("code",0) + 100000,
+                notificationHelper.createCheckpointReminderNotification(p1.getStringExtra("goal_name"),
+                    p1.getIntExtra("code",0),p1.getIntExtra("goal_id",0)).build()
             )
         }
     }

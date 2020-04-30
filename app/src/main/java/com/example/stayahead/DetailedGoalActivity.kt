@@ -22,57 +22,35 @@ import java.text.DecimalFormat
 
 class DetailedGoalActivity : AppCompatActivity() {
     val TAG: String = "DeatailedGoalActivity"
-    lateinit var linearLayout: LinearLayout
     lateinit var tableLayout: TableLayout
     lateinit  var tvPercentage: TextView
-    val map = mutableMapOf<Int, Int>()
-    var goalPercent:String = ""
-    var goalId = -1
-    var goalDate:String = ""
-    var goalName = ""
-    var numOfCheckpoint: Float = 0f
-    var numChecked: Float = 0f
-    var isFinished = false
-    val db = DatabaseHelper(this)
+    private val updatedCheckpoints = mutableMapOf<Int, Int>()
+    private lateinit var goal:Goal
+
+    private var numOfCheckpoint: Float = 0f
+    private var numChecked: Float = 0f
+    private var isFinished = false
+    private val db = DatabaseHelper(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detailed_goal)
+
+        loadCurrentGoalData()
+        loadViewData()
+        loadCreatedCheckpoints()
+    }
+
+    private fun loadViewData(){
         val tvGoalName = findViewById<TextView>(R.id.tvGoalNameDetailed)
         val tvDueDate = findViewById<TextView>(R.id.tvGoalDueDateDetailed)
         val tvFinished = findViewById<TextView>(R.id.tvFinishedDetailed)
         tvPercentage = findViewById<TextView>(R.id.tvPercentageDetailed)
-
-        goalId = intent.getIntExtra("goal_id",-1)
-
-        if(intent.getIntExtra("is_notification",0) == 0){
-            Log.d("NotificationHelper"," shouldnt be a notificaion")
-            goalName = intent.getStringExtra("goal_name")
-            goalDate = intent.getStringExtra("goal_due_date")
-            goalPercent = intent.getStringExtra("goal_percent")
-        }
-        else{
-            val goalC = db.getGoal(goalId)
-            goalC.moveToFirst()
-            goalName = goalC.getString(1)
-            goalDate = goalC.getString(3)
-            goalPercent = goalC.getString(2)
-
-            //clear that notification
-            if(intent.getIntExtra("is_checkpoint",0) == 0) {
-                val nh = NotificationHelper(this)
-                nh.cancelNotification(goalId)
-            }
-            else{
-                val nh = NotificationHelper(this)
-                nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
-            }
-        }
-        //linearLayout = findViewById<LinearLayout>(R.id.detailedLinearLayout)
         tableLayout = findViewById<TableLayout>(R.id.detailedTableLayout)
-       // goalName = intent.getStringExtra("goal_name")
-        tvGoalName.text = (goalName)
-        //goalDate = intent.getStringExtra("goal_due_date")
-        tvDueDate.text = "Due: $goalDate"
+
+
+        tvGoalName.text = (goal.goalName)
+        tvDueDate.text = "Due: ${goal.date}"
         if(intent.getBooleanExtra("goal_finished", false)) {
             tvFinished.text = "Completed"
             isFinished = true
@@ -80,28 +58,42 @@ class DetailedGoalActivity : AppCompatActivity() {
         else
             tvFinished.text = "Ongoing"
 
-        //goalPercent = intent.getStringExtra("goal_percent")
-        tvPercentage.text = "$goalPercent %"
-
-
-        createCheckpoints()
+        tvPercentage.text = "${goal.remainingPercentage} %"
     }
 
-    private fun createCheckpoints() {
+    private fun loadCurrentGoalData(){
+        //goalId = intent.getIntExtra("goal_id",-1)
+
+        if(intent.getIntExtra("is_notification",0) == 0){
+            goal = Goal(intent.getStringExtra("goal_name"), intent.getStringExtra("goal_percent"),
+                intent.getStringExtra("goal_due_date"),false, intent.getIntExtra("goal_id",-1))
+            Log.d(TAG,"Not coming from a notification")
+
+        }
+        else{
+            val goalCursor = db.getGoal(intent.getIntExtra("goal_id",-1))
+            goalCursor.moveToFirst()
+            goal = Goal(goalCursor.getString(1), goalCursor.getString(2),
+                goalCursor.getString(3),false, intent.getIntExtra("goal_id",-1))
+
+            clearNotification()
+        }
+    }
+
+    private fun loadCreatedCheckpoints() {
         val tvParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT,4.6f)
         val tvParams2 = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT,0.2f)
         tvParams.marginStart = 32
         tvParams.marginEnd = 32
         val cbParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT,0.2f)
         val tbParams = TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT,5f)
-        //get all cps for this goal
 
-        val c = db.getCheckpointsForGoal(intent.getIntExtra("goal_id",0))
+        val cursor = db.getCheckpointsForGoal(intent.getIntExtra("goal_id",0))
         
-        while(c.moveToNext()){
-            Log.d("TAG","    :" + c.count +"   c name is : " + c.getString(1) + " : " + c.getString(2) + " : " + c.getString(3) + " : " + c.getString(4))
+        while(cursor.moveToNext()){
+            Log.d("TAG","    :" + cursor.count +"   c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4))
             //                                  name            date         time           completed       goal id         id
-            val currentCheckpoint = Checkpoint(c.getString(1),c.getString(3),"time", (c.getInt(4) > 0), c.getInt(2), c.getInt(0))
+            val currentCheckpoint = Checkpoint(cursor.getString(1),cursor.getString(3),"time", (cursor.getInt(4) > 0), cursor.getInt(2), cursor.getInt(0))
             numOfCheckpoint++
 
             val tvCheckpointName = TextView(this)
@@ -119,39 +111,36 @@ class DetailedGoalActivity : AppCompatActivity() {
             tvCheckpointName.setTextColor(Color.BLACK)
             tvCheckpointName.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
             tvCheckpointName.textSize = 18f
-           // tvCheckpointName.width = 200
 
-                        tvCheckpointDate.text = "Due:\n${currentCheckpoint.date}"
-                        tvCheckpointDate.setTextColor(Color.BLACK)
-                        tvCheckpointDate.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-                        tvCheckpointDate.textSize = 18f
-            // tvCheckpointDate.minWidth = 400
+            tvCheckpointDate.text = "Due:\n${currentCheckpoint.date}"
+            tvCheckpointDate.setTextColor(Color.BLACK)
+            tvCheckpointDate.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+            tvCheckpointDate.textSize = 18f
 
             cbCheckpoint.layoutParams = cbParams
             cbCheckpoint.isChecked = currentCheckpoint.isCompleted
 
             if(currentCheckpoint.isCompleted) {
                 numChecked++
-                map[currentCheckpoint.checkpointId] = 1
+                updatedCheckpoints[currentCheckpoint.checkpointId] = 1
             }
             else
-                map[currentCheckpoint.checkpointId] = 0
+                updatedCheckpoints[currentCheckpoint.checkpointId] = 0
 
 
             cbCheckpoint.setOnClickListener {
                 if(cbCheckpoint.isChecked) {
                     numChecked++
-                    map[currentCheckpoint.checkpointId] = 1
+                    updatedCheckpoints[currentCheckpoint.checkpointId] = 1
                 }
                 else {
                     numChecked--
-                    map[currentCheckpoint.checkpointId] = 0
+                    updatedCheckpoints[currentCheckpoint.checkpointId] = 0
                 }
 
-                //tvPercentage.text = ((numChecked/numOfCheckpoint) * 100).toString()
                 val df = DecimalFormat("#.0")
-                goalPercent = df.format(((numChecked/numOfCheckpoint) * 100))
-                tvPercentage.text = "${goalPercent} %"
+                goal.remainingPercentage = df.format(((numChecked/numOfCheckpoint) * 100))
+                tvPercentage.text = "${goal.remainingPercentage} %"
             }
 
             
@@ -168,8 +157,9 @@ class DetailedGoalActivity : AppCompatActivity() {
 
         }
     }
+
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.detailed_goal_menu, menu)
         if(isFinished) {
             menu.findItem(R.id.action_edit_goal).isVisible = false
@@ -177,7 +167,6 @@ class DetailedGoalActivity : AppCompatActivity() {
         }
         return true
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
@@ -188,10 +177,11 @@ class DetailedGoalActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun finishGoal(){
-        if(goalId == -1 || isFinished)
+
+    private fun finishGoal(){
+        if(goal.goalId == -1 || isFinished)
             return
-        db.finishGoal(goalId)
+        db.finishGoal(goal.goalId)
         db.close()
         Toast.makeText(this,"Goal Finished",Toast.LENGTH_SHORT).show()
         val i = Intent(this, SideNavDrawer::class.java)
@@ -199,52 +189,65 @@ class DetailedGoalActivity : AppCompatActivity() {
         startActivity(i)
     }
 
-    private fun createPendingIntent(resultCode:Int, type:String) : PendingIntent {
-        val notifyIntent = Intent(this, AlarmReceiver::class.java)
-        notifyIntent.putExtra("goal_name",goalName)
-        notifyIntent.putExtra("type",type)
-        notifyIntent.putExtra("code",resultCode)
-        notifyIntent.putExtra("goal_id", goalId)
-        return  PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-     }
-
-    fun deleteGoal(){
-        val pendingIntent = createPendingIntent(goalId, "goal")
-        val am = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        am.cancel(pendingIntent)
-
-        map.forEach {
-
-            val pendingIntent2 = createPendingIntent(it.key,"checkpoint")
-            val am2 = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            am2.cancel(pendingIntent2)
-        }
-
-        if(goalId == -1)
+    private fun deleteGoal(){
+        cancelAlarmManagers()
+        if(goal.goalId == -1)
             return
         Toast.makeText(this,"Goal Deleted",Toast.LENGTH_SHORT).show()
-        db.deleteGoal(goalId)
+        db.deleteGoal(goal.goalId)
         db.close()
 
         val i = Intent(this, SideNavDrawer::class.java)
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(i)
     }
-    fun editGoal(){
+
+    private fun editGoal(){
         val i = Intent(this, EditGoalActivity::class.java)
-        //i.putExtra("goal_name",goalName)
-        i.putExtra("goal_id", goalId)
+        i.putExtra("goal_id", goal.goalId)
         startActivity(i)
+    }
+
+
+    private fun createPendingIntent(resultCode:Int, type:String) : PendingIntent {
+        val notifyIntent = Intent(this, AlarmReceiver::class.java)
+        notifyIntent.putExtra("goal_name",goal.goalName)
+        notifyIntent.putExtra("type",type)
+        notifyIntent.putExtra("code",resultCode)
+        notifyIntent.putExtra("goal_id", goal.goalId)
+        return  PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+     }
+
+    private fun cancelAlarmManagers(){
+        val pendingIntentGoal = createPendingIntent(goal.goalId, "goal")
+        val alarmManagerGoal = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        alarmManagerGoal.cancel(pendingIntentGoal)
+
+        updatedCheckpoints.forEach {
+            val pendingIntentCheckpoint = createPendingIntent(it.key,"checkpoint")
+            val alarmManagerCheckpoint = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManagerCheckpoint.cancel(pendingIntentCheckpoint)
+        }
+    }
+
+    private fun clearNotification(){
+        val nh = NotificationHelper(this)
+        if(intent.getIntExtra("is_checkpoint",0) == 0) {
+            nh.cancelNotification(goal.goalId)
+        }
+        else{
+            nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
+        }
     }
 
 
     override fun onPause() {
         Log.d("TAG", "on PAUSED called")
-        map.forEach{
+        updatedCheckpoints.forEach{
             db.updateCheckpointCompleted(it.key,it.value)
         }
-        db.updateGoalPercentage(goalId,goalPercent)
+        db.updateGoalPercentage(goal.goalId,goal.remainingPercentage)
         super.onPause()
 
     }
@@ -263,11 +266,5 @@ class DetailedGoalActivity : AppCompatActivity() {
         super.finish()
 
     }
-    fun convertDateToStandardView(date:String) : String{
 
-        var s = date.substring(4)
-        s += date.substring(0,4)
-
-        return s
-    }
 }

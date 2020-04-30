@@ -24,6 +24,7 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels()
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun createChannels(){
         val channel1 = NotificationChannel(CHANNEL_NAME_GOALS_ID,CHANNEL_NAME_GOALS,NotificationManager.IMPORTANCE_HIGH)
@@ -34,9 +35,9 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
 
     fun getManager():NotificationManager{
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         return manager
     }
+
     fun cancelNotification(id:Int){
         manager.cancel(id)
     }
@@ -65,6 +66,7 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         return notificationBuilder
     }
 
+
     fun createCheckpointReminderNotification(title: String?, code: Int, goalId: Int):NotificationCompat.Builder {
         val notificationBuilder = NotificationCompat.Builder(applicationContext,CHANNEL_NAME_CHECKPOINTS_ID)
         notificationBuilder.setSmallIcon(R.drawable.ic_date_range_black_24dp)
@@ -90,8 +92,5 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         return notificationBuilder
     }
 
-    companion object{
-
-    }
 
 }

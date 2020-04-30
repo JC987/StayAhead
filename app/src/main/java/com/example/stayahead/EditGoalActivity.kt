@@ -13,59 +13,43 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.core.view.get
-import kotlinx.android.synthetic.main.activity_edit_goal.*
-import kotlinx.android.synthetic.main.fragment_create_new_goal.*
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 class EditGoalActivity : AppCompatActivity() {
-    var goalId = -1
-    lateinit var  tableLayout :TableLayout
-    private lateinit var currentGoal: Goal
-    private  var oldList: ArrayList<Checkpoint> = ArrayList()
-    val mapOld = mutableMapOf<Int, TableRow>()
-    private  var newList: ArrayList<TableRow> = ArrayList()
+    private lateinit var  tableLayout :TableLayout
     private lateinit var etGoalName: EditText
     private lateinit var tvGoalDate: TextView
+    private lateinit var currentGoal: Goal
+    private val oldCheckpoints = mutableMapOf<Int, TableRow>()
+    private var newCheckpoints: ArrayList<TableRow> = ArrayList()
+
     private var hour:Int = 0
     private var minute:Int = 0
     private lateinit var  sharedPreferences:SharedPreferences
-    val goalDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
 
-    var goalDate = ""
-    var totalCheckpoints:Float = 0f
-    var totalCheckpointsCompleted:Float = 0f
+    private val goalDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
+
+    private var numOfCheckpoints:Float = 0f
+    private var numOfCheckpointsCompleted:Float = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.fragment_create_new_goal)
-        goalId = intent.getIntExtra("goal_id",1)
+
+        loadViewData()
+
+        loadGoalData()
+
+        loadCheckpointData()
+
+    }
+
+    private fun loadCheckpointData(){
         val db = DatabaseHelper(this)
-        sharedPreferences = getSharedPreferences("settings",Context.MODE_PRIVATE)
-        etGoalName = findViewById<EditText>(R.id.etGoalName)
-        tvGoalDate = findViewById<TextView>(R.id.tvDueDate)
-        hour = sharedPreferences.getInt("notification_time_hour",9)
-        minute = sharedPreferences.getInt("notification_time_minute",0)
-        val btnDate = findViewById<Button>(R.id.btnPickDueDate)
-        val btnAddCheckpoint = findViewById<Button>(R.id.btnAddCheckpoint)
-         tableLayout = findViewById<TableLayout>(R.id.lvCheckpoints)
-        val btnSubmit = findViewById<Button>(R.id.btnSubmitNewGoal)
-
-
-        val c = db.getGoal(goalId)
-        c.moveToNext()
-        Log.d("TAG","count is " + c.count)
-        Log.d("TAG",c.getString(1))
-        etGoalName.setText(c.getString(1))
-//        currentGoal.goalName = c.getString(1)
-        goalDate = c.getString(3)
-  //      currentGoal.date = c.getString(3)
-        tvGoalDate.text = "Due date is: " + goalDate
-        currentGoal = Goal(c.getString(1),"",c.getString(3),false,goalId)
-
-        val c2 = db.getAllCheckpointsOfGoal(goalId)
-        while(c2.moveToNext()){
+        val checkpointCursor = db.getAllCheckpointsOfGoal(currentGoal.goalId)
+        while(checkpointCursor.moveToNext()){
 
             val tableRow = TableRow(this)
             val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT)
@@ -80,8 +64,8 @@ class EditGoalActivity : AppCompatActivity() {
             editText.layoutParams = etParams
             btnDateCk.layoutParams = btnParams
 
-            editText.setText(c2.getString(1))
-            btnDateCk.text = c2.getString(3)
+            editText.setText(checkpointCursor.getString(1))
+            btnDateCk.text = checkpointCursor.getString(3)
 
             btnDateCk.setOnClickListener{
                 datePickerDialog(btnDateCk)
@@ -91,13 +75,39 @@ class EditGoalActivity : AppCompatActivity() {
             tableRow.addView(btnDateCk)
             tableLayout.addView(tableRow)
 
-            mapOld[c2.getInt(0)] = tableRow//same as .put
+            oldCheckpoints[checkpointCursor.getInt(0)] = tableRow//same as .put
 
-            if(c2.getInt(4) == 1){
-                totalCheckpointsCompleted+=1
+            if(checkpointCursor.getInt(4) == 1){
+                numOfCheckpointsCompleted+=1
             }
-            totalCheckpoints+=1
+            numOfCheckpoints+=1
         }
+
+    }
+
+    private fun loadGoalData(){
+        val db = DatabaseHelper(this)
+        val goalCursor = db.getGoal(intent.getIntExtra("goal_id",1))
+        goalCursor.moveToNext()
+        Log.d("TAG","count is " + goalCursor.count)
+        Log.d("TAG",goalCursor.getString(1))
+        etGoalName.setText(goalCursor.getString(1))
+
+        currentGoal = Goal(goalCursor.getString(1),"",goalCursor.getString(3),false, intent.getIntExtra("goal_id",1))
+        tvGoalDate.text = "Due date is: " + currentGoal.date
+    }
+
+    private fun loadViewData(){
+        //goalId = intent.getIntExtra("goal_id",1)
+        tableLayout = findViewById<TableLayout>(R.id.lvCheckpoints)
+        sharedPreferences = getSharedPreferences("settings",Context.MODE_PRIVATE)
+        etGoalName = findViewById<EditText>(R.id.etGoalName)
+        tvGoalDate = findViewById<TextView>(R.id.tvDueDate)
+        hour = sharedPreferences.getInt("notification_time_hour",9)
+        minute = sharedPreferences.getInt("notification_time_minute",0)
+        val btnDate = findViewById<Button>(R.id.btnPickDueDate)
+        val btnAddCheckpoint = findViewById<Button>(R.id.btnAddCheckpoint)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmitNewGoal)
 
         btnDate.setOnClickListener {
             datePickerDialog(btnDate)
@@ -106,11 +116,11 @@ class EditGoalActivity : AppCompatActivity() {
             submit()
         }
         btnAddCheckpoint.setOnClickListener{
-            createCheckpoint()
+            createNewCheckpoint()
         }
     }
 
-    fun createCheckpoint(){
+    private fun createNewCheckpoint(){
         val tableRow = TableRow(this)
         val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT)
 
@@ -141,33 +151,14 @@ class EditGoalActivity : AppCompatActivity() {
         tableLayout.addView(tableRow)
 
 
-        newList.add(tableRow)
+        newCheckpoints.add(tableRow)
 
-        totalCheckpoints+=1
+        numOfCheckpoints+=1
     }
 
 
-  /*  fun removeItemDialog(tr: TableRow){
-        val dialog = AlertDialog.Builder(this)
-        dialog.setTitle("Delete Checkpoint")
-        dialog.setMessage("Do you want to delete this checkpoint")
-        dialog.setPositiveButton( "Yes", DialogInterface.OnClickListener { dialogInterface, i ->
-            Log.d("TAG", "Deleting a checkpoint row")
-            tableLayout.removeView(tr)
-            cpList.remove(tr)
-            Toast.makeText(this,"Deleted!",Toast.LENGTH_SHORT).show()
 
-        })
-        dialog.setNegativeButton("No", DialogInterface.OnClickListener { dialogInterface, i ->
-            Toast.makeText(this,"Canceled!",Toast.LENGTH_SHORT).show()
-        })
-        //?dialog.create()
-        dialog.show()
-
-    }
-*/
-
-    fun datePickerDialog(btn:Button){
+    private fun datePickerDialog(btn:Button){
         val view = View.inflate(this,R.layout.dialog_datepicker, null)
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
 
@@ -177,16 +168,17 @@ class EditGoalActivity : AppCompatActivity() {
         dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
         ) { _: DialogInterface, _:Int ->
-           var tmpDate =  if((dp.month + 1)<10)
+           val tmpDate =  if((dp.month + 1)<10)
                 "${dp.year}-0${(dp.month + 1)}-${dp.dayOfMonth}"
             else
                  "${dp.year}-${(dp.month + 1)}-${dp.dayOfMonth}"
 
             if(btn.id == R.id.btnPickDueDate){
-                goalDate = tmpDate
-                val tmp = "Due Date is: " + goalDate
+                currentGoal.date = tmpDate
+                val tmp = "Due Date is: " + currentGoal.date
                 tvGoalDate.text = tmp
 
+                //set the date/time for alarm
                 goalDateTimeToAlarm.set(Calendar.YEAR, dp.year)
                 goalDateTimeToAlarm.set(Calendar.MONTH, dp.month)
                 goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
@@ -196,56 +188,71 @@ class EditGoalActivity : AppCompatActivity() {
 
 
             }
-            else
-                if(goalDate < tmpDate){
+            else {
+                if (currentGoal.date < tmpDate) {
                     Toast.makeText(this,"Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
-                    btn.text = goalDate
-                }
-                else
+                    btn.text = currentGoal.date
+                } else
                     btn.text = tmpDate
+            }
         }
         dialog.create()
         dialog.show()
 
     }
 
-
-    private fun submit() {
+    private fun saveNewCheckpoints(){
         val db = DatabaseHelper(this)
 
-        for (i:Int in 0 until newList.size){
-            val et =  newList.get(i).getChildAt(0) as EditText
-            val d = (newList.get(i).getChildAt(1) as Button).text.toString()
-            val ck = Checkpoint(et.text.toString(),d,"time",false, goalId,db.getCheckpointDBCount()+1)
+        for (i:Int in 0 until newCheckpoints.size){
+            val et =  newCheckpoints.get(i).getChildAt(0) as EditText
+            val d = (newCheckpoints.get(i).getChildAt(1) as Button).text.toString()
+            val ck = Checkpoint(et.text.toString(),d,"time",false, currentGoal.goalId,db.getCheckpointDBCount()+1)
 
             val cpTime = getCheckpointTimeInMillis(d)
             createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
-
-
             db.addCheckpointData(ck)
+
             Log.d("TAG", "${et.text}")
         }
+    }
 
-        mapOld.forEach{
+    private fun savePreviousCheckpoints(){
+        val db = DatabaseHelper(this)
+
+        oldCheckpoints.forEach{
             val id = it.key
             val updatedName = (it.value.getChildAt(0) as EditText).text.toString()
             val updatedDate = (it.value.getChildAt(1) as Button).text.toString()
-            val ck = Checkpoint(updatedName,updatedDate,"time",false, goalId,id)
+            val ck = Checkpoint(updatedName,updatedDate,"time",false, currentGoal.goalId, id)
 
             val cpTime = getCheckpointTimeInMillis(updatedDate)
             updateAlarmManager(ck.checkpointId,"checkpoint", cpTime)
-
-
             db.updateCheckpointData(id,updatedName,updatedDate)
         }
+    }
 
+    private fun saveGoal(){
+        val db = DatabaseHelper(this)
+
+        //calculate new goal percent
         val df = DecimalFormat("0.0")
-        val newPercent = (df.format(((totalCheckpointsCompleted/totalCheckpoints) * 100))).toString()
-        Log.d("TAG!", "nP " + newPercent + " " + totalCheckpoints + " " + totalCheckpointsCompleted)
-        db.updateGoalNameAndDate(goalId,etGoalName.text.toString(), goalDate, newPercent)
+        val newPercent = (df.format(((numOfCheckpointsCompleted/numOfCheckpoints) * 100))).toString()
 
-        updateAlarmManager(goalId,"goal",goalDateTimeToAlarm.timeInMillis)
+        //update checkpoint and alarm manager
+        db.updateGoalNameAndDate(currentGoal.goalId,etGoalName.text.toString(), currentGoal.date, newPercent)
+        updateAlarmManager(currentGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
 
+    }
+
+    private fun submit() {
+        saveNewCheckpoints()
+
+        savePreviousCheckpoints()
+
+        saveGoal()
+
+        //create intent
         Toast.makeText(this,"Goal Edited",Toast.LENGTH_SHORT).show()
         val i = Intent(this, SideNavDrawer::class.java)
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -254,7 +261,7 @@ class EditGoalActivity : AppCompatActivity() {
 
 
     private fun getCheckpointTimeInMillis(checkpointDate:String):Long{
-        var sp = checkpointDate.split("-")
+        val sp = checkpointDate.split("-")
         val cpDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
         cpDateTimeToAlarm.set(Calendar.YEAR, sp[0].toInt())
         cpDateTimeToAlarm.set(Calendar.MONTH, (sp[1].toInt() -1) )
@@ -264,7 +271,6 @@ class EditGoalActivity : AppCompatActivity() {
         cpDateTimeToAlarm.set(Calendar.SECOND, 0)
         return cpDateTimeToAlarm.timeInMillis
     }
-
     private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
         val pendingIntent = createPendingIntent(resultCode,typeValue,false)
         val am = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager

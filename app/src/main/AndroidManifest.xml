@@ -12,7 +12,12 @@
         <activity android:name=".EditGoalActivity"></activity>
         <receiver android:name="com.example.stayahead.AlarmReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.media.action.DISPLAY_NOTIFICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".SideNavDrawer"
             android:theme="@style/AppTheme.NoActionBar">
