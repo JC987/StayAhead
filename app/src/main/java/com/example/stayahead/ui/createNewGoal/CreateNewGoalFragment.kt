@@ -70,7 +70,10 @@ class CreateNewGoalFragment : Fragment() {
             datePickerDialog(btnDueDate)
         }
         btnSubmit.setOnClickListener{
-            submit()
+            if(etGoalName.text.toString() != "" || goalDate != "")
+                submit()
+            else
+                Toast.makeText(root.context,"Can't submit with an empty goal or date",Toast.LENGTH_SHORT).show()
         }
         btnAddCheckpoint.setOnClickListener{
             createCheckpoint()
