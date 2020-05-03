@@ -176,6 +176,8 @@ class DetailedGoalActivity : AppCompatActivity() {
 
 
     private fun finishGoal(){
+        clearAllNotifications()
+        cancelAlarmManagers()
         if(goal.goalId == -1 || isFinished)
             return
         db.finishGoal(goal.goalId)
@@ -187,6 +189,7 @@ class DetailedGoalActivity : AppCompatActivity() {
     }
 
     private fun deleteGoal(){
+        clearAllNotifications()
         cancelAlarmManagers()
         if(goal.goalId == -1)
             return
@@ -236,6 +239,17 @@ class DetailedGoalActivity : AppCompatActivity() {
         else{
             nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
         }
+    }
+
+    private fun clearAllNotifications(){
+        val nh = NotificationHelper(this)
+        nh.cancelNotification(goal.goalId)
+
+        updatedCheckpoints.forEach {
+            nh.cancelNotification(it.key + 100000)
+        }
+        //nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
+
     }
 
 

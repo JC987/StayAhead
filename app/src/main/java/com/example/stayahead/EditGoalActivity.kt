@@ -24,7 +24,7 @@ class EditGoalActivity : AppCompatActivity() {
     private lateinit var currentGoal: Goal
     private val oldCheckpoints = mutableMapOf<Int, TableRow>()
     private var newCheckpoints: ArrayList<TableRow> = ArrayList()
-
+    private var isGoalDateChanged = false
     private var hour:Int = 0
     private var minute:Int = 0
     private lateinit var  sharedPreferences:SharedPreferences
@@ -91,6 +91,7 @@ class EditGoalActivity : AppCompatActivity() {
         goalCursor.moveToNext()
         Log.d("TAG","count is " + goalCursor.count)
         Log.d("TAG",goalCursor.getString(1))
+        Log.d("TAG",goalCursor.getString(3))
         etGoalName.setText(goalCursor.getString(1))
 
         currentGoal = Goal(goalCursor.getString(1),"",goalCursor.getString(3),false, intent.getIntExtra("goal_id",1))
@@ -177,7 +178,7 @@ class EditGoalActivity : AppCompatActivity() {
                 currentGoal.date = tmpDate
                 val tmp = "Due Date is: " + currentGoal.date
                 tvGoalDate.text = tmp
-
+                isGoalDateChanged = true
                 //set the date/time for alarm
                 goalDateTimeToAlarm.set(Calendar.YEAR, dp.year)
                 goalDateTimeToAlarm.set(Calendar.MONTH, dp.month)
@@ -238,10 +239,11 @@ class EditGoalActivity : AppCompatActivity() {
         //calculate new goal percent
         val df = DecimalFormat("0.0")
         val newPercent = (df.format(((numOfCheckpointsCompleted/numOfCheckpoints) * 100))).toString()
-
+        Log.d("TAG", "goaldate is " + currentGoal.date)
         //update checkpoint and alarm manager
         db.updateGoalNameAndDate(currentGoal.goalId,etGoalName.text.toString(), currentGoal.date, newPercent)
-        updateAlarmManager(currentGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
+        if(isGoalDateChanged)
+            updateAlarmManager(currentGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
 
     }
 
