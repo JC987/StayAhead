@@ -7,14 +7,19 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Resources
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.children
+import androidx.core.view.marginLeft
 import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -59,7 +64,7 @@ class CreateNewGoalFragment : Fragment() {
         tvDateAndTime = root.findViewById(R.id.tvDueDate)
         layout = root.findViewById(R.id.lvCheckpoints)
         cpList = ArrayList()
-
+        //layout.setBackgroundColor(Color.LTGRAY)
 
         btnDueDate.setOnClickListener {
             datePickerDialog(btnDueDate)
@@ -201,13 +206,14 @@ class CreateNewGoalFragment : Fragment() {
     private fun createCheckpoint(){
         val tableRow = TableRow(root.context)
         val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT)
-
+        //trParams.setMargins(32,32,32,32)
         val etParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 10f);
         val editText = EditText(root.context)
-
-        val btnDateCk = Button(root.context)
+       // etParams.setMargins(32,32,32,32)
+        val btnDateCk =  Button(root.context)//Button(ContextThemeWrapper(root.context, R.style.Widget_MaterialComponents_Button_OutlinedButton))
         val btnParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f);
-
+       // btnParams.setMargins(32,32,32,32)
+        //tableRow.setBackgroundColor(Color.WHITE)
 
         btnDateCk.setOnClickListener {
             datePickerDialog(btnDateCk)
@@ -216,7 +222,10 @@ class CreateNewGoalFragment : Fragment() {
         tableRow.layoutParams = trParams
 
         btnDateCk.text = "Date"
-
+        //btnDateCk.setBackgroundResource( root.context.resources R.style.Widget_MaterialComponents_Button_OutlinedButton
+        //btnDateCk.setBackgroundColor(Color.parseColor("#f0f0f0"))
+        //btnDateCk.setTextColor(root.context.getResources().getColor(R.color.colorPrimaryDark5))
+        //btnDateCk.setBackgroundResource(R.drawable.full_border)
         btnDateCk.layoutParams = btnParams
 
         editText.layoutParams = etParams

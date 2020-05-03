@@ -1,7 +1,5 @@
 package com.example.stayahead
 
-import android.app.Activity
-import android.app.ActivityManager
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -12,12 +10,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
-import androidx.core.view.marginLeft
-import androidx.core.view.marginStart
-import com.example.stayahead.ui.createNewGoal.CreateNewGoalFragment
-import com.example.stayahead.ui.home.HomeFragment
 import java.text.DecimalFormat
 
 class DetailedGoalActivity : AppCompatActivity() {
@@ -83,11 +77,11 @@ class DetailedGoalActivity : AppCompatActivity() {
     private fun loadCreatedCheckpoints() {
         val tvParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT,4.6f)
         val tvParams2 = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT,0.2f)
-        tvParams.marginStart = 32
-        tvParams.marginEnd = 32
+        tvParams.setMargins(0,32,0,32)
         val cbParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT,0.2f)
+        cbParams.setMargins(0,32,0,32)
         val tbParams = TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT,5f)
-
+        tbParams.setMargins(32,32,32,32)
         val cursor = db.getCheckpointsForGoal(intent.getIntExtra("goal_id",0))
         
         while(cursor.moveToNext()){
@@ -99,7 +93,8 @@ class DetailedGoalActivity : AppCompatActivity() {
             val tvCheckpointName = TextView(this)
             val tvCheckpointDate = TextView(this)
             val cbCheckpoint = CheckBox(this)
-
+            tvCheckpointDate.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            tvCheckpointName.textAlignment = View.TEXT_ALIGNMENT_CENTER
             if(isFinished)
                 cbCheckpoint.isEnabled = false
 
@@ -145,6 +140,8 @@ class DetailedGoalActivity : AppCompatActivity() {
 
             
             val tableRow = TableRow(this)
+            //tableRow.setBackgroundColor(Color.WHITE)
+            tableRow.setBackgroundResource(R.drawable.full_border)
             tableRow.layoutParams = tbParams
 
             tableRow.addView(tvCheckpointName)

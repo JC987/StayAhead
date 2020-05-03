@@ -1,78 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".DetailedGoalActivity"
-
+    android:background="#FAFAFA"
     android:orientation="vertical">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/bottom_border"
+                    android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/tvGoalNameDetailed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="8dp"
+                        <TextView
+                            android:id="@+id/tvGoalNameDetailed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_marginStart="8dp"
 
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="0dp"
-            android:layout_toStartOf="@+id/tvPercentageDetailed"
-            android:text="goal name here"
-            android:textColor="#000"
-            android:textSize="24sp" />
-
-
-        <TextView
-            android:id="@+id/tvPercentageDetailed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:text="100%"
-            android:textColor="#000"
-            android:textSize="18sp" />
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_toStartOf="@+id/tvPercentageDetailed"
+                            android:text="goal name here"
+                            android:textColor="#000"
+                            android:textSize="24sp" />
 
 
-        <TextView
-            android:id="@+id/tvFinishedDetailed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tvGoalNameDetailed"
-            android:layout_alignParentStart="true"
-
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="0dp"
-            android:layout_toStartOf="@+id/tvGoalDueDateDetailed"
-            android:text="Still Ongoing"
-            android:textColor="#000"
-            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/tvPercentageDetailed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="100%"
+                            android:textColor="#000"
+                            android:textSize="18sp" />
 
 
-        <TextView
-            android:id="@+id/tvGoalDueDateDetailed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvGoalNameDetailed"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:text="MM/DD/YYYY"
-            android:textColor="#000"
-            android:textSize="18sp" />
+                        <TextView
+                            android:id="@+id/tvFinishedDetailed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tvGoalNameDetailed"
+                            android:layout_alignParentStart="true"
+
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginBottom="0dp"
+                            android:layout_toStartOf="@+id/tvGoalDueDateDetailed"
+                            android:text="Still Ongoing"
+                            android:textColor="#000"
+                            android:textSize="18sp" />
+
+
+                        <TextView
+                            android:id="@+id/tvGoalDueDateDetailed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tvGoalNameDetailed"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="MM/DD/YYYY"
+                            android:textColor="#000"
+                            android:textSize="18sp" />
+
+
+                </RelativeLayout>
+
+        </LinearLayout>
+
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/tvFinishedDetailed"
-            android:layout_marginTop="32dp">
+            android:layout_marginTop="0dp">
 
                 <TableLayout
                     android:id="@+id/detailedTableLayout"
@@ -80,16 +94,7 @@
                     android:layout_height="match_parent">
 
                 </TableLayout>
-                <!--<LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/detailedLinearLayout">
-
-                </LinearLayout>
-                -->
         </ScrollView>
 
 
-
-</RelativeLayout>
+</LinearLayout>

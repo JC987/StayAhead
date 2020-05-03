@@ -26,6 +26,7 @@ class PreviousGoalFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.fragment_previous_goals, container, false)
         val rv = root.findViewById<RecyclerView>(R.id.rvPreviousGoalFragment)
+
         db = DatabaseHelper(root.context)
         val c = db.getFinishedGoals()
         if(c.count < 1){

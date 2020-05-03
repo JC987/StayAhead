@@ -6,7 +6,9 @@
     android:minHeight="64dp"
     android:orientation="horizontal"
     android:paddingStart="12dp"
-    android:paddingEnd="12dp">
+    android:paddingEnd="12dp"
+    android:background="@drawable/dashed_bottom_border"
+    >
 
     <TextView
         android:id="@+id/goalListText1"
@@ -19,6 +21,7 @@
         android:layout_marginEnd="16dp"
         android:layout_toStartOf="@+id/goalListText2"
         android:hint="THIS IS A GOAL!"
+        android:textColor="#000"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textSize="20sp" />
 
@@ -33,5 +36,7 @@
         android:textAlignment="center"
         android:hint="85%"
         android:textColor="#000"
+
         android:textSize="16sp" />
+
 </RelativeLayout>
