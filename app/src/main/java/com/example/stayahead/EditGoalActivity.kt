@@ -164,6 +164,8 @@ class EditGoalActivity : AppCompatActivity() {
         val dp = view.findViewById<DatePicker>(R.id.datePicker)
 
         val dialog = AlertDialog.Builder(this)
+        val d = Date()
+        dp.minDate = d.time
 
         dialog.setView(view)
         dialog.setTitle("Date Picker")
@@ -190,11 +192,21 @@ class EditGoalActivity : AppCompatActivity() {
 
             }
             else {
-                if (currentGoal.date < tmpDate) {
-                    Toast.makeText(this,"Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
+                val dateTime = Calendar.getInstance(Locale.getDefault())//0//d.time
+                dateTime.set(Calendar.YEAR, dp.year)
+                dateTime.set(Calendar.MONTH, dp.month)
+                dateTime.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
+                dateTime.set(Calendar.HOUR_OF_DAY, hour)
+                dateTime.set(Calendar.MINUTE, minute)
+                dateTime.set(Calendar.SECOND, 0)
+                if (goalDateTimeToAlarm.timeInMillis < dateTime.timeInMillis) {
+                    Toast.makeText(this, "Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
                     btn.text = currentGoal.date
-                } else
+                }
+                else {
                     btn.text = tmpDate
+                }
+
             }
         }
         dialog.create()

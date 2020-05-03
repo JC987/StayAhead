@@ -190,12 +190,20 @@ class CreateNewGoalFragment : Fragment() {
             }
             else {
 
-                if(goalDate < tmpDate){
-                    Toast.makeText(root.context,"Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
+                val dateTime = Calendar.getInstance(Locale.getDefault())//0//d.time
+                dateTime.set(Calendar.YEAR, dp.year)
+                dateTime.set(Calendar.MONTH, dp.month)
+                dateTime.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
+                dateTime.set(Calendar.HOUR_OF_DAY, hour)
+                dateTime.set(Calendar.MINUTE, minute)
+                dateTime.set(Calendar.SECOND, 0)
+                if (goalDateTimeToAlarm.timeInMillis < dateTime.timeInMillis) {
+                    Toast.makeText(root.context, "Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
                     btn.text = goalDate
                 }
-                else
+                else {
                     btn.text = tmpDate
+                }
             }
 
         }
