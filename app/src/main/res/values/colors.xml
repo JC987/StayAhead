@@ -20,4 +20,5 @@
     <color name="colorPrimaryDark5">#8961DC</color>
     <color name="colorPrimaryLight5">#DAC8FF</color>
     <color name="colorAccent5">#00A500</color>
+    <color name="colorAccentLight5">#00EF00</color>
 </resources>

@@ -30,7 +30,7 @@ class SideNavDrawer : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_previous_goal, R.id.nav_settings,
-                R.id.nav_create_goal
+                R.id.nav_create_goal, R.id.nav_stats
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

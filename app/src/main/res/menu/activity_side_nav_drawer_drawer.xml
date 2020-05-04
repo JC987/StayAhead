@@ -20,7 +20,10 @@
             android:id="@+id/nav_create_goal"
             android:icon="@drawable/ic_add_black_24dp"
             android:title="@string/menu_create_goal" />
-
+        <item
+            android:id="@+id/nav_stats"
+            android:icon="@drawable/ic_sort_black_24dp"
+            android:title="@string/menu_stats" />
     </group>
 
 <!--
