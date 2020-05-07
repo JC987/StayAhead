@@ -85,6 +85,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         return c
     }
 
+    fun getNumberOFCheckpointsCompleted(): Int{
+        val db = this.writableDatabase
+        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL4 = 1",null)
+        c.moveToFirst()
+        return c.getInt(0)
+    }
+
     fun addCheckpointData(checkpoint: Checkpoint): Boolean {
         val db = this.writableDatabase
         val contentValues = ContentValues()
