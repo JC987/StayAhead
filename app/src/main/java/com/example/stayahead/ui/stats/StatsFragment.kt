@@ -17,6 +17,7 @@ import com.example.stayahead.R
 import com.example.stayahead.ui.stats.StatsViewModel
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -34,27 +35,26 @@ class StatsFragment : Fragment() {
         root = inflater.inflate(R.layout.fragment_stats, container, false)
         spinner = root.findViewById<Spinner>(R.id.statsSpinner)
         pieChart = root.findViewById<PieChart>(R.id.pieChart)
-        val currentStats = listOf("Goals Finished","Checkpoints Completed","Goals finished on time", "Completion Percent of Goals")
+        val currentStats = listOf("Goals Finished","Checkpoints Completed", "Completion Percent of Goals")
 
         spinner.adapter = ArrayAdapter(root.context, R.layout.support_simple_spinner_dropdown_item, currentStats)
+        val desc = Description()
+        desc.text = ""
+        pieChart.description = desc
 
 
-        /*when (spinner.selectedItemPosition) {
-            0 -> defChart()
-            1 -> checkpointStats()
-        }*/
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 when (position) {
                     0 -> {
                         defChart()
-                        Toast.makeText(root.context, "pos " + position, Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(root.context, "pos " + position, Toast.LENGTH_SHORT).show()
                     }
                     1 -> {
                         checkpointStats()
-                        Toast.makeText(root.context, "pos " + position, Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(root.context, "pos " + position, Toast.LENGTH_SHORT).show()
                     }
-                    3 -> {
+                    2 -> {
                         finishedGoalStats()
                     }
                 }
@@ -92,7 +92,7 @@ class StatsFragment : Fragment() {
         }
         pieChart.holeRadius = 25f
         pieChart.transparentCircleRadius = 50f
-        val pieEntryList = listOf<PieEntry>(PieEntry( num100.toFloat(),"Fully completed"),PieEntry( num50.toFloat(),"At least half done"),PieEntry( num0.toFloat(),"Less than half done"))
+        val pieEntryList = listOf<PieEntry>(PieEntry( num100.toFloat(),"Fully completed"),PieEntry( num50.toFloat(),"At least half completed"),PieEntry( num0.toFloat(),"Less than half completed"))
 
         val pieDataSet = PieDataSet(pieEntryList,"")
 
@@ -118,14 +118,15 @@ class StatsFragment : Fragment() {
     fun checkpointStats(){
         val db = DatabaseHelper(root.context)
 
-        val totalFinished = db.getFinishedGoals().count.toFloat()
-        val totalActive = db.getAllGoalData(false).count.toFloat()
-        val total = (totalActive + totalFinished)
         val n = db.getNumberOFCheckpointsCompleted().toFloat()
-        val n2 = db.getCheckpointDBCount().toFloat()
+        val n2 = db.getNumberOFCheckpointsFailed().toFloat()
+        val c = db.getAllCheckpointData(false)
+        while(c.moveToNext()){
+            Log.d("stats:" , "c " + c.getString(1) +" goal id " + c.getInt(2) + " completed " + c.getInt(4))
+        }
         pieChart.holeRadius = 25f
         pieChart.transparentCircleRadius = 50f
-        val pieEntryList = listOf<PieEntry>(PieEntry( n,"Finished"),PieEntry( n2-n,"Failed"))
+        val pieEntryList = listOf<PieEntry>(PieEntry( n,"Finished"),PieEntry( n2,"Failed"))
 
         val pieDataSet = PieDataSet(pieEntryList,"")
 
@@ -155,7 +156,7 @@ class StatsFragment : Fragment() {
 
         pieChart.holeRadius = 25f
         pieChart.transparentCircleRadius = 50f
-        val pieEntryList = listOf<PieEntry>(PieEntry( (totalFinished/total),"Finished"),PieEntry( (totalActive/total),"Incomplete"))
+        val pieEntryList = listOf<PieEntry>(PieEntry( (totalFinished),"Finished"),PieEntry( (totalActive),"Incomplete"))
 
         val pieDataSet = PieDataSet(pieEntryList,"")
 

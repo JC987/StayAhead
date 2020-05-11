@@ -93,10 +93,14 @@ class CreateNewGoalFragment : Fragment() {
             false, id)
         for (i:Int in 0 until cpList.size){
             val et =  cpList.get(i).getChildAt(0) as EditText
-            val d = (cpList.get(i).getChildAt(1) as Button).text.toString()
+            var d = (cpList.get(i).getChildAt(1) as Button).text.toString()
+            if(d == "Date")
+                d = newGoal.date
             val ck = Checkpoint(et.text.toString(),d,"time",false, id,db.getCheckpointDBCount()+1)
 
-            val cpTime = getCheckpointTimeInMillis(d)
+
+
+             val  cpTime  = getCheckpointTimeInMillis(d)
             createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
 
             newGoal.addCheckpoint(ck)
@@ -164,7 +168,7 @@ class CreateNewGoalFragment : Fragment() {
         val dialog = AlertDialog.Builder(root.context)
         val d = Date()
         dp.minDate = d.time
-        Toast.makeText(root.context,"min is " + dp.minDate + " : " + d, Toast.LENGTH_SHORT).show()
+        //Toast.makeText(root.context,"min is " + dp.minDate + " : " + d, Toast.LENGTH_SHORT).show()
         dialog.setView(view)
         dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
@@ -194,8 +198,8 @@ class CreateNewGoalFragment : Fragment() {
                 dateTime.set(Calendar.YEAR, dp.year)
                 dateTime.set(Calendar.MONTH, dp.month)
                 dateTime.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
-                dateTime.set(Calendar.HOUR_OF_DAY, hour)
-                dateTime.set(Calendar.MINUTE, minute)
+                dateTime.set(Calendar.HOUR_OF_DAY, 0)
+                dateTime.set(Calendar.MINUTE, 0)
                 dateTime.set(Calendar.SECOND, 0)
                 if (goalDateTimeToAlarm.timeInMillis < dateTime.timeInMillis) {
                     Toast.makeText(root.context, "Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()

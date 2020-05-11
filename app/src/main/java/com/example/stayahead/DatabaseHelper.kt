@@ -91,6 +91,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         c.moveToFirst()
         return c.getInt(0)
     }
+    fun getNumberOFCheckpointsFailed(): Int{
+        val db = this.writableDatabase
+        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL4 = 0",null)
+        c.moveToFirst()
+        return c.getInt(0)
+    }
 
     fun addCheckpointData(checkpoint: Checkpoint): Boolean {
         val db = this.writableDatabase
@@ -161,9 +167,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
 
     fun deleteGoal(goalId:Int){
         val db = this.writableDatabase
-        db.execSQL("DELETE FROM $GOAL_TABLE_NAME WHERE ID = $goalId")
+
         db.execSQL("DELETE FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $goalId")
-        db.close()
+        db.execSQL("DELETE FROM $GOAL_TABLE_NAME WHERE ID = $goalId")
+        //db.close()
+    }
+    fun deleteAllCheckpointsForGoal(goalId:Int){
+
     }
 
 
