@@ -133,7 +133,7 @@ class DetailedGoalActivity : AppCompatActivity() {
                     updatedCheckpoints[currentCheckpoint.checkpointId] = 0
                 }
 
-                val df = DecimalFormat("#.0")
+                val df = DecimalFormat("0.0")
                 goal.remainingPercentage = df.format(((numChecked/numOfCheckpoint) * 100))
                 tvPercentage.text = "${goal.remainingPercentage} %"
             }

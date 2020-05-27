@@ -18,7 +18,7 @@
         android:id="@+id/action_sort_upcoming"
         android:orderInCategory="3"
         android:icon="@drawable/ic_date_range_black_24dp"
-        android:title="Sort by upcoming date"
+        android:title="Furthest due date first"
         app:showAsAction="never"
         />
 </menu>

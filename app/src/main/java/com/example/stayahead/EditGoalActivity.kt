@@ -44,6 +44,19 @@ class EditGoalActivity : AppCompatActivity() {
 
         loadCheckpointData()
 
+        val x = goalDateTimeToAlarm.timeInMillis
+        val goalDateSplit = currentGoal.date.split("-")
+        goalDateTimeToAlarm.set(Calendar.YEAR,Integer.parseInt(goalDateSplit[0]))
+        goalDateTimeToAlarm.set(Calendar.MONTH,Integer.parseInt(goalDateSplit[1]))
+        goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH,Integer.parseInt(goalDateSplit[2]))
+        goalDateTimeToAlarm.set(Calendar.HOUR, hour)
+        goalDateTimeToAlarm.set(Calendar.MINUTE, minute)
+        goalDateTimeToAlarm.set(Calendar.SECOND, 0)
+
+        Log.d("asdfasdf:", "x is "+ x)
+        Log.d("asdfasdf:", "time is "+ goalDateTimeToAlarm.timeInMillis);
+       // Toast.makeText(this," " + x +" : x <- gdtta is " + goalDateTimeToAlarm.timeInMillis,Toast.LENGTH_LONG).show();
+
     }
 
     private fun loadCheckpointData(){
@@ -199,7 +212,7 @@ class EditGoalActivity : AppCompatActivity() {
                 dateTime.set(Calendar.HOUR_OF_DAY, hour)
                 dateTime.set(Calendar.MINUTE, minute)
                 dateTime.set(Calendar.SECOND, 0)
-                if (goalDateTimeToAlarm.timeInMillis < dateTime.timeInMillis) {
+                if (currentGoal.date < tmpDate) {
                     Toast.makeText(this, "Can't have a checkpoint due after goal's date", Toast.LENGTH_LONG).show()
                     btn.text = currentGoal.date
                 }
@@ -216,13 +229,20 @@ class EditGoalActivity : AppCompatActivity() {
 
     private fun saveNewCheckpoints(){
         val db = DatabaseHelper(this)
-
+        Log.d("asdfasdf:", "time is "+ goalDateTimeToAlarm.timeInMillis);
         for (i:Int in 0 until newCheckpoints.size){
             val et =  newCheckpoints.get(i).getChildAt(0) as EditText
-            val d = (newCheckpoints.get(i).getChildAt(1) as Button).text.toString()
+            var d = (newCheckpoints.get(i).getChildAt(1) as Button).text.toString()
+            var cpTime = goalDateTimeToAlarm.timeInMillis
+            Log.d("asdfasdf:", "cpTime is "+ cpTime);
+            if(d != "Date") {
+                cpTime = getCheckpointTimeInMillis(d)
+            }
+            if(d == "Date"){
+                d = currentGoal.date
+            }
             val ck = Checkpoint(et.text.toString(),d,"time",false, currentGoal.goalId,db.getCheckpointDBCount()+1)
 
-            val cpTime = getCheckpointTimeInMillis(d)
             createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
             db.addCheckpointData(ck)
 
