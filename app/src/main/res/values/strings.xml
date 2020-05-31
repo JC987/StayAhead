@@ -18,6 +18,14 @@
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
 
+    <string-array name="limit_checkpoints">
+        <item>50</item>
+        <item>25</item>
+        <item>20</item>
+        <item>15</item>
+        <item>10</item>
+    </string-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
