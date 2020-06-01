@@ -42,6 +42,7 @@ class CreateNewGoalFragment : Fragment() {
     private lateinit var cpList: ArrayList<TableRow>
     private lateinit var btnSubmit: Button
     private lateinit var sharedPreferences: SharedPreferences
+    private var limit:Int = 0
     private var hour:Int = 0
     private var minute:Int = 0
     val goalDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
@@ -58,6 +59,7 @@ class CreateNewGoalFragment : Fragment() {
         sharedPreferences = root.context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         hour = sharedPreferences.getInt("notification_time_hour",9)
         minute = sharedPreferences.getInt("notification_time_minute",0)
+        limit = sharedPreferences.getInt("limit_checkpoints",50)
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
         val btnAddCheckpoint: Button = root.findViewById(R.id.btnAddCheckpoint)
@@ -76,7 +78,13 @@ class CreateNewGoalFragment : Fragment() {
                 Toast.makeText(root.context,"Can't submit with an empty goal or date",Toast.LENGTH_SHORT).show()
         }
         btnAddCheckpoint.setOnClickListener{
-            createCheckpoint()
+            if(cpList.size <= limit)
+                createCheckpoint()
+            else{
+                Toast.makeText(root.context, "Limited to only $limit checkpoints", Toast.LENGTH_SHORT).show()
+                Log.d("TAG:", "limit is "+ limit)
+                Log.d("TAG:", " size is "+ cpList.size)
+            }
         }
 
         return root
@@ -101,15 +109,16 @@ class CreateNewGoalFragment : Fragment() {
 
 
              val  cpTime  = getCheckpointTimeInMillis(d)
-            createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
+            if(sharedPreferences.getInt("send_checkpoint",1) == 1)
+                createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
 
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
             Log.d(TAG, "${et.text}")
         }
 
-
-        createAlarmManager(newGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
+        if(sharedPreferences.getInt("send_goal",1) == 1)
+            createAlarmManager(newGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
 
         db.addGoalData(newGoal)
         parentFragmentManager.popBackStack()

@@ -1,6 +1,7 @@
 package com.example.stayahead
 
 import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -126,6 +127,10 @@ class DetailedGoalActivity : AppCompatActivity() {
             cbCheckpoint.setOnClickListener {
                 if(cbCheckpoint.isChecked) {
                     numChecked++
+                    val sharedPreferences = getSharedPreferences("settings",Context.MODE_PRIVATE)
+
+                    if(numChecked == numOfCheckpoint && sharedPreferences.getInt("auto_complete", 0) == 1)
+                        createFinishDialog()
                     updatedCheckpoints[currentCheckpoint.checkpointId] = 1
                 }
                 else {
@@ -155,6 +160,32 @@ class DetailedGoalActivity : AppCompatActivity() {
         }
     }
 
+    private fun createFinishDialog() {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Finish Goal")
+        dialog.setMessage("Do you want to finish this goal?")
+        dialog.setPositiveButton("Yes"){ _, _ ->
+            finishGoal()
+        }
+        dialog.setNegativeButton("No"){_, _ ->}
+
+        dialog.create()
+        dialog.show()
+    }
+
+    private  fun createDeleteDialog(){
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Delete Goal")
+        dialog.setMessage("Do you want to delete this goal? Can not be undone!")
+        dialog.setPositiveButton("Yes"){ _, _ ->
+            deleteGoal()
+        }
+        dialog.setNegativeButton("No"){ _, _ ->}
+
+        dialog.create()
+        dialog.show()
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.detailed_goal_menu, menu)
@@ -167,8 +198,8 @@ class DetailedGoalActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.action_finish -> finishGoal()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
-            R.id.action_delete -> deleteGoal()//Toast.makeText(this,"GOAL deleted", Toast.LENGTH_LONG).show()
+            R.id.action_finish -> createFinishDialog()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
+            R.id.action_delete -> createDeleteDialog()//Toast.makeText(this,"GOAL deleted", Toast.LENGTH_LONG).show()
             R.id.action_edit_goal -> editGoal()//Toast.makeText(this,"GOAL edited", Toast.LENGTH_LONG).show()
         }
         return super.onOptionsItemSelected(item)
