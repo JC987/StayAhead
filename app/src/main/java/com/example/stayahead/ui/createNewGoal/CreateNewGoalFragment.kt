@@ -21,6 +21,7 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.core.view.marginLeft
 import androidx.core.view.marginStart
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -36,10 +37,10 @@ class CreateNewGoalFragment : Fragment() {
 
     private lateinit var toolsViewModel: CreateNewGoalViewModel
     private lateinit var root: View
-    private lateinit var layout: TableLayout
+    private lateinit var layout: LinearLayout
     private lateinit var tvDateAndTime: TextView
     private lateinit var newGoal: Goal
-    private lateinit var cpList: ArrayList<TableRow>
+    private lateinit var cpList: ArrayList<LinearLayout>
     private lateinit var btnSubmit: Button
     private lateinit var sharedPreferences: SharedPreferences
     private var limit:Int = 0
@@ -47,7 +48,8 @@ class CreateNewGoalFragment : Fragment() {
     private var minute:Int = 0
     val goalDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
     private val TAG = "CreateNewGoalFragment:"
-    private var goalDate = ""
+    private var goalDate = "-"
+    private var goalTime = "-"
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,6 +63,7 @@ class CreateNewGoalFragment : Fragment() {
         minute = sharedPreferences.getInt("notification_time_minute",0)
         limit = sharedPreferences.getInt("limit_checkpoints",50)
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
+        val btnDueTime: Button = root.findViewById(R.id.btnPickDueTime)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
         val btnAddCheckpoint: Button = root.findViewById(R.id.btnAddCheckpoint)
         tvDateAndTime = root.findViewById(R.id.tvDueDate)
@@ -71,11 +74,14 @@ class CreateNewGoalFragment : Fragment() {
         btnDueDate.setOnClickListener {
             datePickerDialog(btnDueDate)
         }
+        btnDueTime.setOnClickListener {
+            timePickerDialog(btnDueTime)
+        }
         btnSubmit.setOnClickListener{
-            if(etGoalName.text.toString() != "" || goalDate != "")
+            if(etGoalName.text.toString() != "" && goalDate != "-" && goalTime != "-")
                 submit()
             else
-                Toast.makeText(root.context,"Can't submit with an empty goal or date",Toast.LENGTH_SHORT).show()
+                Toast.makeText(root.context,"A goal must have a name, date and time",Toast.LENGTH_SHORT).show()
         }
         btnAddCheckpoint.setOnClickListener{
             if(cpList.size <= limit)
@@ -97,24 +103,28 @@ class CreateNewGoalFragment : Fragment() {
         // can get a view by its id name
 
 
-        newGoal = Goal(etGoalName.text.toString(),"0.0", goalDate,
+        newGoal = Goal(etGoalName.text.toString(),"0.0", goalDate, goalTime,
             false, id)
         for (i:Int in 0 until cpList.size){
-            val et =  cpList.get(i).getChildAt(0) as EditText
-            var d = (cpList.get(i).getChildAt(1) as Button).text.toString()
-            if(d == "Date")
-                d = newGoal.date
-            val ck = Checkpoint(et.text.toString(),d,"time",false, id,db.getCheckpointDBCount()+1)
+            val cpName =  (cpList.get(i).getChildAt(0) as EditText).text.toString()
+            var cpDate = ((cpList.get(i).getChildAt(1) as LinearLayout).getChildAt(0) as Button).text.toString()
+            var cpTime = ((cpList.get(i).getChildAt(1) as LinearLayout).getChildAt(1) as Button).text.toString()
+            if(cpDate == "Date")
+                cpDate = newGoal.date
+            if(cpTime == "Time")
+                cpTime = newGoal.time
+            val ck = Checkpoint(cpName, cpDate, cpTime,false, id,db.getCheckpointDBCount()+1)
+            Log.d("TAG:", "et is $cpName d is $cpDate  d2 is $cpTime")
 
-
-
-             val  cpTime  = getCheckpointTimeInMillis(d)
-            if(sharedPreferences.getInt("send_checkpoint",1) == 1)
-                createAlarmManager(ck.checkpointId,"checkpoint", cpTime)
-
+            val  cpTimeInMillis  = getCheckpointTimeInMillis(cpDate, cpTime)
+            if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
+                Log.d("TAG:","Checkpoint in millis " + cpTimeInMillis + " ::  cp id " + ck.checkpointId)
+                createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
+            }
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
-            Log.d(TAG, "${et.text}")
+            Log.d(TAG, "$cpName")
+
         }
 
         if(sharedPreferences.getInt("send_goal",1) == 1)
@@ -124,14 +134,16 @@ class CreateNewGoalFragment : Fragment() {
         parentFragmentManager.popBackStack()
     }
 
-    private fun getCheckpointTimeInMillis(checkpointDate:String):Long{
-        var sp = checkpointDate.split("-")
+    private fun getCheckpointTimeInMillis(checkpointDate:String, checkpointTime: String):Long{
+        var dateArr = checkpointDate.split("-")
+        var timeArr = checkpointTime.split(":")
+        Log.d("TAG:", " cp time is  $checkpointTime  [0] is ${timeArr[0]} [1] is ${timeArr[1]}")
         val cpDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
-        cpDateTimeToAlarm.set(Calendar.YEAR, sp[0].toInt())
-        cpDateTimeToAlarm.set(Calendar.MONTH, (sp[1].toInt() -1) )
-        cpDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, sp[2].toInt())
-        cpDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, hour)
-        cpDateTimeToAlarm.set(Calendar.MINUTE, minute)
+        cpDateTimeToAlarm.set(Calendar.YEAR, dateArr[0].toInt())
+        cpDateTimeToAlarm.set(Calendar.MONTH, (dateArr[1].toInt() -1) )
+        cpDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, dateArr[2].toInt())
+        cpDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, timeArr[0].toInt())
+        cpDateTimeToAlarm.set(Calendar.MINUTE, timeArr[1].toInt())
         cpDateTimeToAlarm.set(Calendar.SECOND, 0)
         return cpDateTimeToAlarm.timeInMillis
     }
@@ -198,7 +210,7 @@ class CreateNewGoalFragment : Fragment() {
                 goalDateTimeToAlarm.set(Calendar.SECOND, 0)
 
                 goalDate = tmpDate
-                val tmp = "Due Date is: " + goalDate
+                val tmp = "Due on : $goalDate at $goalTime"
                 tvDateAndTime.text = tmp
             }
             else {
@@ -227,16 +239,95 @@ class CreateNewGoalFragment : Fragment() {
 
     }
 
+    private fun timePickerDialog(btn: Button){
+        val dialog = AlertDialog.Builder(root.context)
+        val view = View.inflate(root.context, R.layout.dialog_timepicker,null)
+        val tp = view.findViewById<TimePicker>(R.id.timePicker)
+        dialog.setView(view)
+        dialog.setTitle("Time Picker")
+        var tpHour = hour
+        var tpMin = minute
+        var tmpTime = ""
+        dialog.setPositiveButton("Confirm"){ _,_ ->
+            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+                Toast.makeText(root.context, "TP: " + tp.hour + " : " + tp.minute, Toast.LENGTH_SHORT).show()
+                tpHour = tp.hour
+                tpMin = tp.minute
+            }
+            else {
+                Toast.makeText(root.context, "TP: " + tp.currentHour + " : " + tp.currentMinute, Toast.LENGTH_SHORT).show()
+                tpHour = tp.currentHour
+                tpMin = tp.currentMinute
+            }
+
+            tmpTime = "$tpHour:$tpMin"
+
+
+            if(btn.id == R.id.btnPickDueTime){
+                goalTime = tmpTime
+                val tmp = "Due on : $goalDate at $goalTime"
+                tvDateAndTime.text = tmp
+
+                goalDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, tpHour)
+                goalDateTimeToAlarm.set(Calendar.MINUTE, tpMin)
+                goalDateTimeToAlarm.set(Calendar.SECOND, 0)
+            }
+            else{
+                btn.text = tmpTime
+            }
+        }
+        dialog.create()
+        dialog.show()
+
+
+    }
+
     private fun createCheckpoint(){
+        val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null)
+        val linearLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        linearLayoutParams.setMargins(16,16,16,16)
+        linearLayout.layoutParams = linearLayoutParams
+        linearLayout.background = root.context.getDrawable(R.drawable.dashed_full_border)
+        linearLayout.setPadding(8,16,8,16)
+
+        val editText = linearLayout.findViewById<EditText>(R.id.etEditCheckpointName)
+        val btnDate = linearLayout.findViewById<Button>(R.id.btnCheckpointDate)
+        val btnTime = linearLayout.findViewById<Button>(R.id.btnCheckpointTime)
+
+        btnDate.setOnClickListener {
+            datePickerDialog(btnDate)
+        }
+
+        btnTime.setOnClickListener {
+            timePickerDialog(btnTime)
+        }
+
+        cpList.add((linearLayout as LinearLayout))
+
+        layout.addView(linearLayout)
+    }
+
+   /* private fun createCheckpoint(){
+        val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null) as LinearLayout //LinearLayout(root.context)
+        val linearLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT,1f)
+        //linearLayout.orientation = LinearLayout.VERTICAL
+
+        val linearLayoutButtons = LinearLayout(root.context)
+        val linearLayoutButtonsParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
+        //linearLayoutButtons.orientation = LinearLayout.HORIZONTAL
+
         val tableRow = TableRow(root.context)
-        val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT)
+        val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT,1f)
         //trParams.setMargins(32,32,32,32)
-        val etParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 10f);
+        val etParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         val editText = EditText(root.context)
        // etParams.setMargins(32,32,32,32)
         val btnDateCk =  Button(root.context)//Button(ContextThemeWrapper(root.context, R.style.Widget_MaterialComponents_Button_OutlinedButton))
-        val btnParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f);
-       // btnParams.setMargins(32,32,32,32)
+        val btnParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        val btnTimeCk =  Button(root.context)//Button(ContextThemeWrapper(root.context, R.style.Widget_MaterialComponents_Button_OutlinedButton))
+        val btnTimeParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+
+        // btnParams.setMargins(32,32,32,32)
         //tableRow.setBackgroundColor(Color.WHITE)
 
         btnDateCk.setOnClickListener {
@@ -246,25 +337,31 @@ class CreateNewGoalFragment : Fragment() {
         tableRow.layoutParams = trParams
 
         btnDateCk.text = "Date"
+        btnTimeCk.text = "Time"
         //btnDateCk.setBackgroundResource( root.context.resources R.style.Widget_MaterialComponents_Button_OutlinedButton
         //btnDateCk.setBackgroundColor(Color.parseColor("#f0f0f0"))
         //btnDateCk.setTextColor(root.context.getResources().getColor(R.color.colorPrimaryDark5))
         //btnDateCk.setBackgroundResource(R.drawable.full_border)
         btnDateCk.layoutParams = btnParams
+        btnTimeCk.layoutParams = btnTimeParams
 
         editText.layoutParams = etParams
         editText.hint = "Enter a checkpoint!"
         editText.setPadding(32,8,32,64)
 
-        tableRow.addView(editText)
-        tableRow.addView(btnDateCk)
-        layout.addView(tableRow)
+        //linearLayout.layoutParams = linearLayoutParams
+        linearLayoutButtons.layoutParams = linearLayoutButtonsParams
 
-        editText.setOnLongClickListener {
-            removeItemDialog(tableRow)
-            true
-        }
+        linearLayoutButtons.setBackgroundColor(Color.GREEN)
+
+        layout.addView(linearLayout)
+      //  val linearList = listOf<LinearLayout>(linearLayout)
+
+        //val adapter = ArrayAdapter<LinearLayout>(root.context,R.layout.test_list_view_item, linearList)
+
+        //layout.adapter = adapter
+        //layout.addView(linearLayout)
         cpList.add(tableRow)
 
-    }
+    }*/
 }

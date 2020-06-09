@@ -36,7 +36,7 @@ class PreviousGoalFragment : Fragment() {
         val listOfGoals = ArrayList<Goal>()
         while(c.moveToNext()){
             val bool = c.getInt(4) > 0
-            val newGoal = Goal(c.getString(1),c.getString(2), c.getString(3), bool, c.getInt(0))
+            val newGoal = Goal(c.getString(1),c.getString(2), c.getString(3), c.getString(4), bool, c.getInt(0))
             listOfGoals.add(newGoal)
         }
 

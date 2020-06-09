@@ -49,6 +49,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         if(intent.getBooleanExtra("goal_finished", false)) {
             tvFinished.text = "Completed"
             isFinished = true
+            Log.d("TAG:", "detailed:: goal finished true")
         }
         else
             tvFinished.text = "Ongoing"
@@ -61,7 +62,7 @@ class DetailedGoalActivity : AppCompatActivity() {
 
         if(intent.getIntExtra("is_notification",0) == 0){
             goal = Goal(intent.getStringExtra("goal_name"), intent.getStringExtra("goal_percent"),
-                intent.getStringExtra("goal_due_date"),false, intent.getIntExtra("goal_id",-1))
+                intent.getStringExtra("goal_due_date"),"",false, intent.getIntExtra("goal_id",-1))
             Log.d(TAG,"Not coming from a notification")
 
         }
@@ -69,7 +70,7 @@ class DetailedGoalActivity : AppCompatActivity() {
             val goalCursor = db.getGoal(intent.getIntExtra("goal_id",-1))
             goalCursor.moveToFirst()
             goal = Goal(goalCursor.getString(1), goalCursor.getString(2),
-                goalCursor.getString(3),false, intent.getIntExtra("goal_id",-1))
+                goalCursor.getString(3),"",false, intent.getIntExtra("goal_id",-1))
 
             clearNotification()
         }
@@ -88,7 +89,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         while(cursor.moveToNext()){
             Log.d("TAG","    :" + cursor.count +"   c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4))
             //                                  name            date         time           completed       goal id         id
-            val currentCheckpoint = Checkpoint(cursor.getString(1),cursor.getString(3),"time", (cursor.getInt(4) > 0), cursor.getInt(2), cursor.getInt(0))
+            val currentCheckpoint = Checkpoint(cursor.getString(1),cursor.getString(3),cursor.getString(4), (cursor.getInt(5) > 0), cursor.getInt(2), cursor.getInt(0))
             numOfCheckpoint++
 
             val tvCheckpointName = TextView(this)

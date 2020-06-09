@@ -91,8 +91,8 @@ class HomeFragment : Fragment() {
         while(cursor.moveToNext()){
             //                                          goal name               percent                    date                          finished
             Log.d("TAG","       c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4) + " : key is "+ sortKey)
-            val bool = cursor.getInt(4) > 0
-            val newGoal = Goal(cursor.getString(1),cursor.getString(2), cursor.getString(3), bool, cursor.getInt(0))
+            val bool = cursor.getInt(5) > 0
+            val newGoal = Goal(cursor.getString(1),cursor.getString(2), cursor.getString(3), cursor.getString(4), bool, cursor.getInt(0))
             listItems.add(newGoal)
         }
         if(cursor.count < 1){

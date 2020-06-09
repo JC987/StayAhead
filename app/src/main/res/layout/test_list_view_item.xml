@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etEditCheckpointName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter a checkpoint name!"
+            android:textAlignment="center" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:id="@+id/btnCheckpointDate"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/colorPrimary5"
+                android:theme="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="Date"/>
+
+            <Button
+                android:id="@+id/btnCheckpointTime"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/colorPrimary5"
+                android:theme="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:text="Time"/>
+        </LinearLayout>
+    </LinearLayout>

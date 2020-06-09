@@ -19,7 +19,7 @@
     <string name="menu_send">Send</string>
 
     <string-array name="limit_checkpoints">
-        <item>50</item>
+        <item>30</item>
         <item>25</item>
         <item>20</item>
         <item>15</item>

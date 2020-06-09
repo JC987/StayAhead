@@ -23,14 +23,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
                 GOAL_COL1 + " TEXT, " +
                 GOAL_COL2 + " TEXT, " +
                 GOAL_COL3 + " DATE Default CURRENT_DATE, " +
-                GOAL_COL4 + " BOOLEAN)"
+                GOAL_COL4 + " Time Default CURRENT_TIME, " +
+                GOAL_COL5 + " BOOLEAN)"
 
         Log.d("TAG", "onCreate: table created")
         val createCheckpointTable = "CREATE TABLE $CHECKPOINT_TABLE_NAME ( ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "$CHECKPOINT_COL1 TEXT, " +
                 "$CHECKPOINT_COL2 INT, " +
                 "$CHECKPOINT_COL3 DATE Default CURRENT_DATE, " +
-                "$CHECKPOINT_COL4 BOOLEAN, "  +
+                "$CHECKPOINT_COL4 TIME Default CURRENT_TIME, " +
+                "$CHECKPOINT_COL5 BOOLEAN, "  +
                 "FOREIGN KEY($CHECKPOINT_COL2) REFERENCES $GOAL_TABLE_NAME(ID)" + ")"
 
         Log.d("TAG", "onCreate: table created")
@@ -53,7 +55,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(GOAL_COL2, goal.remainingPercentage)
         if(goal.date != "")
             contentValues.put(GOAL_COL3, goal.date)
-        contentValues.put(GOAL_COL4, goal.isFinished)
+        if(goal.time != "")
+            contentValues.put(GOAL_COL4, goal.time)
+        contentValues.put(GOAL_COL5, goal.isFinished)
         val result = db.insert(GOAL_TABLE_NAME, null, contentValues)
         val i: Int = -1
         Log.d("TAG", "added called")
@@ -87,13 +91,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
 
     fun getNumberOFCheckpointsCompleted(): Int{
         val db = this.writableDatabase
-        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL4 = 1",null)
+        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL5 = 1",null)
         c.moveToFirst()
         return c.getInt(0)
     }
     fun getNumberOFCheckpointsFailed(): Int{
         val db = this.writableDatabase
-        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL4 = 0",null)
+        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL5 = 0",null)
         c.moveToFirst()
         return c.getInt(0)
     }
@@ -108,7 +112,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(CHECKPOINT_COL2, checkpoint.goalId)
         if(checkpoint.date != "Date")
             contentValues.put(CHECKPOINT_COL3, checkpoint.date)
-        contentValues.put(CHECKPOINT_COL4, checkpoint.isCompleted)
+        if(checkpoint.time != "Time")
+            contentValues.put(CHECKPOINT_COL4, checkpoint.time)
+        contentValues.put(CHECKPOINT_COL5, checkpoint.isCompleted)
         val result = db.insert(CHECKPOINT_TABLE_NAME, null, contentValues)
         val i: Int = -1
         //db.close()
@@ -116,32 +122,35 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         return result != i.toLong()
     }
 
-    fun updateCheckpointData(checkpointId: Int, newName: String, newDate: String){
+    fun updateCheckpointData(updatedCheckpoint: Checkpoint){
         val db = this.writableDatabase
-        Log.d("TAG","col will be " + newName)
+        Log.d("TAG","col will be " + updatedCheckpoint.checkpointName)
         val contentValues = ContentValues()
-        contentValues.put(CHECKPOINT_COL1,newName)
-        contentValues.put(CHECKPOINT_COL3,newDate)
+        contentValues.put(CHECKPOINT_COL1,updatedCheckpoint.checkpointName)
+        contentValues.put(CHECKPOINT_COL3,updatedCheckpoint.date)
+        contentValues.put(CHECKPOINT_COL4,updatedCheckpoint.time)
+        //TODO: UPDATE newTime
         val where = "ID = ?"
-        db.update(CHECKPOINT_TABLE_NAME,contentValues,where,arrayOf(checkpointId.toString()))
+        db.update(CHECKPOINT_TABLE_NAME,contentValues,where,arrayOf(updatedCheckpoint.checkpointId.toString()))
         //db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL1 = '${newName}', $CHECKPOINT_COL3 = '${newDate}' WHERE ID = ${checkpointId}")
     }
 
     fun updateCheckpointCompleted(id:Int, value:Int){
         val db = this.writableDatabase
-        db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL4 = $value WHERE ID = $id")
+        db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL5 = $value WHERE ID = $id")
     }
 
-    fun updateGoalNameAndDate(goalId:Int,newGoalName:String, newGoalDate:String, newPercent:String){
+    fun updateGoalNameAndDate(updatedGoal: Goal){
         val db = this.writableDatabase
         val contentValue = ContentValues()
-        contentValue.put(GOAL_COL1,newGoalName)
-        contentValue.put(GOAL_COL2,newPercent)
-        contentValue.put(GOAL_COL3,newGoalDate)
+        contentValue.put(GOAL_COL1,updatedGoal.goalName)
+        contentValue.put(GOAL_COL2,updatedGoal.remainingPercentage)
+        contentValue.put(GOAL_COL3,updatedGoal.date)
+        contentValue.put(GOAL_COL4,updatedGoal.time)
         val where = "ID = ?"
         val args = ArrayList<String?>()
-        args.add(goalId.toString())
-        db.update(GOAL_TABLE_NAME,contentValue,where, arrayOf(goalId.toString()))
+        args.add(updatedGoal.goalId.toString())
+        db.update(GOAL_TABLE_NAME,contentValue,where, arrayOf(updatedGoal.goalId.toString()))
         //db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL1 = '${newGoalName}', $GOAL_COL3 = '${newGoalDate}', $GOAL_COL2 = '${newPercent}' WHERE ID = ${goalId}")
 
     }
@@ -157,12 +166,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
 
     fun finishGoal(goalId:Int){
         val db = this.writableDatabase
-        db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL4 = 1 WHERE ID = $goalId")
+        db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL5 = 1 WHERE ID = $goalId")
     }
 
     fun getFinishedGoals(): Cursor{
         val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL4 = 1", null)
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL5 = 1", null)
     }
 
     fun deleteGoal(goalId:Int){
@@ -180,15 +189,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     fun getAllGoalData(desc: Boolean): Cursor {
         val db = this.writableDatabase
         return if (desc) db.rawQuery(
-            "SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL4 = 0 ORDER BY id DESC",
+            "SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY id DESC",
             null
-        ) else db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL4 = 0" , null)
+        ) else db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0" , null)
 
     }
 
     fun getAllGoalDataByDate(): Cursor {
         val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL4 = 0 ORDER BY $GOAL_COL3 DESC" , null)
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3 DESC" , null)
     }
 
     fun getAllCheckpointData(desc: Boolean): Cursor {
@@ -230,14 +239,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         const val GOAL_COL1 = "Name"
         const val GOAL_COL2 = "Percentage"
         const val GOAL_COL3 = "Date"
-        const val GOAL_COL4 = "Finished"
+        const val GOAL_COL4 = "Time"
+        const val GOAL_COL5 = "Finished"
         var GOAL_COUNT = 0
 
         const val CHECKPOINT_TABLE_NAME = "Checkpoints"
         const val CHECKPOINT_COL1 = "Name"
         const val CHECKPOINT_COL2 = "GoalId"
         const val CHECKPOINT_COL3 = "Date"
-        const val CHECKPOINT_COL4 = "Completed"
+        const val CHECKPOINT_COL4 = "Time"
+        const val CHECKPOINT_COL5 = "Completed"
     }
 
     
