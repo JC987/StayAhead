@@ -50,8 +50,8 @@ class EditGoalActivity : AppCompatActivity() {
         goalDateTimeToAlarm.set(Calendar.YEAR,Integer.parseInt(goalDateSplit[0]))
         goalDateTimeToAlarm.set(Calendar.MONTH, goalDateSplit[1].toInt() - 1)
         goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH,Integer.parseInt(goalDateSplit[2]))
-        goalDateTimeToAlarm.set(Calendar.HOUR, hour )
-        goalDateTimeToAlarm.set(Calendar.MINUTE, minute)
+        goalDateTimeToAlarm.set(Calendar.HOUR, 0 )
+        goalDateTimeToAlarm.set(Calendar.MINUTE, 0)
         goalDateTimeToAlarm.set(Calendar.SECOND, 0)
 
         Log.d("TAG:", "x is "+ x + " h "+ hour + " m " +minute + " month " + (Integer.parseInt(goalDateSplit[1]) - 1))
@@ -200,9 +200,6 @@ class EditGoalActivity : AppCompatActivity() {
                 goalDateTimeToAlarm.set(Calendar.YEAR, dp.year)
                 goalDateTimeToAlarm.set(Calendar.MONTH, dp.month)
                 goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
-                goalDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, hour)
-                goalDateTimeToAlarm.set(Calendar.MINUTE, minute)
-                goalDateTimeToAlarm.set(Calendar.SECOND, 0)
 
                 Log.d("TAG:","x again " + goalDateTimeToAlarm.timeInMillis + " " + dp.month + "  " + dp.dayOfMonth)
             }
@@ -293,7 +290,9 @@ class EditGoalActivity : AppCompatActivity() {
                 cpTime = currentGoal.time
             val ck = Checkpoint(et.text.toString(),cpDate,cpTime,false, currentGoal.goalId,db.getCheckpointDBCount()+1)
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
-                createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
+                //createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
+                val pendingIntent = AlarmReceiver.createPendingIntent(this, ck.checkpointId, "checkpoint", currentGoal.goalName, currentGoal.goalId)
+                AlarmReceiver.createAlarmManager(this, pendingIntent,cpTimeInMillis)
             }
             db.addCheckpointData(ck)
 
@@ -312,10 +311,14 @@ class EditGoalActivity : AppCompatActivity() {
 
             val ck = Checkpoint(updatedName,updatedDate,updatedTime,false, currentGoal.goalId, id)
 
-            val cpTime = getCheckpointTimeInMillis(updatedDate,updatedTime)
-            Log.d("TAG:","savePreviousCP : cp time " + cpTime)
+            val cpTimeInMillis = getCheckpointTimeInMillis(updatedDate,updatedTime)
+            Log.d("TAG:","savePreviousCP : cp time " + cpTimeInMillis)
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
-                updateAlarmManager(ck.checkpointId, "checkpoint", cpTime)
+                Log.d("TAG:","send goal update alarm manager " + currentGoal.goalId + "  " + goalDateTimeToAlarm.timeInMillis)
+
+                val pendingIntent = AlarmReceiver.createPendingIntent(this,ck.checkpointId,"checkpoint", currentGoal.goalName, currentGoal.goalId)
+                AlarmReceiver.createAlarmManager(this, pendingIntent, cpTimeInMillis)
+                //updateAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
             }
             db.updateCheckpointData(ck)
         }
@@ -333,7 +336,10 @@ class EditGoalActivity : AppCompatActivity() {
         currentGoal.remainingPercentage = newPercent
         if((sharedPreferences.getInt("send_goal",1) == 1) ) {
             Log.d("TAG:","send goal update alarm manager " + currentGoal.goalId + "  " + goalDateTimeToAlarm.timeInMillis)
-            updateAlarmManager(currentGoal.goalId, "goal", goalDateTimeToAlarm.timeInMillis)
+
+            val pendingIntent = AlarmReceiver.createPendingIntent(this,currentGoal.goalId,"goal", currentGoal.goalName, currentGoal.goalId)
+            AlarmReceiver.createAlarmManager(this, pendingIntent, goalDateTimeToAlarm.timeInMillis)
+            //updateAlarmManager(currentGoal.goalId, "goal", goalDateTimeToAlarm.timeInMillis)
         }
         db.updateGoalNameAndDate(currentGoal)
 
@@ -367,7 +373,7 @@ class EditGoalActivity : AppCompatActivity() {
         cpDateTimeToAlarm.set(Calendar.SECOND, 0)
         return cpDateTimeToAlarm.timeInMillis
     }
-
+/*
     private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
         val pendingIntent = createPendingIntent(resultCode,typeValue,false)
         val am = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -391,5 +397,5 @@ class EditGoalActivity : AppCompatActivity() {
         else
             PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
-
+*/
 }

@@ -111,9 +111,19 @@ class AlarmReceiver : BroadcastReceiver() {
             notifyIntent.putExtra("code",resultCode)
             notifyIntent.putExtra("goal_id", goalId)
             return PendingIntent.getBroadcast(context, resultCode,
-                notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                notifyIntent, PendingIntent.FLAG_ONE_SHOT)
         }
+      /*  fun updatePendingIntent(context: Context, resultCode:Int, typeValue:String, goalName:String, goalId: Int) : PendingIntent {
+            val notifyIntent = Intent(this, AlarmReceiver::class.java)
+            notifyIntent.putExtra("goal_name",currentGoal.goalName)
+            notifyIntent.putExtra("type",typeValue)
+            notifyIntent.putExtra("code",resultCode)
+            notifyIntent.putExtra("goal_id", currentGoal.goalId)
+            return
+                PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-    }
+        }*/
+
+        }
     
 }
