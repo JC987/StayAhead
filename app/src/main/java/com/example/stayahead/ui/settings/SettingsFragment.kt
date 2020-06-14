@@ -19,7 +19,7 @@ import com.example.stayahead.R
 class SettingsFragment : Fragment() {
 
     private lateinit var root: View
-    private lateinit var btnTimePicker:Button
+    //private lateinit var btnTimePicker:Button
     private lateinit var cbSendGoalNotifications:CheckBox
     private lateinit var cbSendCheckpointNotifications:CheckBox
     private lateinit var cbAutoComplete:CheckBox
@@ -33,7 +33,7 @@ class SettingsFragment : Fragment() {
     ): View? {
         root = inflater.inflate(R.layout.fragment_settings, container, false)
         val btnTruncate: Button = root.findViewById(R.id.btnDropTables)
-        btnTimePicker = root.findViewById(R.id.btnSettingsTimePicker)
+        //btnTimePicker = root.findViewById(R.id.btnSettingsTimePicker)
         sharedPreferences = root.context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
         cbSendGoalNotifications = root.findViewById(R.id.cbSettingsGoalNotification)
@@ -46,9 +46,9 @@ class SettingsFragment : Fragment() {
         btnTruncate.setOnClickListener {
             createTruncateDialog()
         }
-        btnTimePicker.setOnClickListener {
+       /* btnTimePicker.setOnClickListener {
             createTimePickerDialog()
-        }
+        }*/
 
         cbSendCheckpointNotifications.setOnClickListener {
             val editor = sharedPreferences.edit()
@@ -103,7 +103,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun loadSettings() {
-        btnTimePicker.text = "${sharedPreferences.getInt("notification_time_hour",9)}:${sharedPreferences.getInt("notification_time_minute",0)}"
+        //btnTimePicker.text = "${sharedPreferences.getInt("notification_time_hour",9)}:${sharedPreferences.getInt("notification_time_minute",0)}"
         cbSendGoalNotifications.isChecked = (sharedPreferences.getInt("send_goal",1) == 1)
         cbSendCheckpointNotifications.isChecked = (sharedPreferences.getInt("send_checkpoint", 1) == 1)
         cbAutoComplete.isChecked = (sharedPreferences.getInt("auto_complete", 0) == 1)
@@ -135,14 +135,14 @@ class SettingsFragment : Fragment() {
         dialog.setView(view)
         dialog.setPositiveButton("Confirm") { _: DialogInterface, _: Int ->
             if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-                btnTimePicker.text = "${tp.currentHour}:${tp.currentMinute}"
+                //btnTimePicker.text = "${tp.currentHour}:${tp.currentMinute}"
                 val editor = sharedPreferences.edit()
                 editor.putInt("notification_time_hour",tp.currentHour)
                 editor.putInt("notification_time_minute",tp.currentMinute)
                 editor.apply()
             }
             else {
-                btnTimePicker.text = "${tp.hour}:${tp.minute}"
+                //btnTimePicker.text = "${tp.hour}:${tp.minute}"
                 val editor = sharedPreferences.edit()
                 editor.putInt("notification_time_hour",tp.hour)
                 editor.putInt("notification_time_minute",tp.minute)

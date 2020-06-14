@@ -1,6 +1,7 @@
 package com.example.stayahead.ui.previousGoal
 
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,5 +47,13 @@ class PreviousGoalFragment : Fragment() {
         rv.adapter = adapter
 
         return root
+    }
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
     }
 }

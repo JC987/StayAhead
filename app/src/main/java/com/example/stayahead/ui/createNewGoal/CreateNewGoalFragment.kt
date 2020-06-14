@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -62,6 +63,7 @@ class CreateNewGoalFragment : Fragment() {
         hour = sharedPreferences.getInt("notification_time_hour",9)
         minute = sharedPreferences.getInt("notification_time_minute",0)
         limit = sharedPreferences.getInt("limit_checkpoints",50)
+        Log.d("TAG:", " goaldatetime is " + goalDateTimeToAlarm.timeInMillis)
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
         val btnDueTime: Button = root.findViewById(R.id.btnPickDueTime)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
@@ -149,9 +151,12 @@ class CreateNewGoalFragment : Fragment() {
     }
 
     private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
+        Log.d("TAG:", " CAM: time is " + time + " s "+ typeValue)
         val pendingIntent = createPendingIntent(resultCode,typeValue)
         val am = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.setExact(AlarmManager.RTC_WAKEUP,time, pendingIntent)
+        //am.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent)
+        am.setRepeating(AlarmManager.RTC_WAKEUP, time, 6000,pendingIntent)
+
 
     }
     private fun createPendingIntent(resultCode:Int, typeValue:String) : PendingIntent{
@@ -205,13 +210,14 @@ class CreateNewGoalFragment : Fragment() {
                 goalDateTimeToAlarm.set(Calendar.YEAR, dp.year)
                 goalDateTimeToAlarm.set(Calendar.MONTH, dp.month)
                 goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
-                goalDateTimeToAlarm.set(Calendar.HOUR_OF_DAY, hour)
-                goalDateTimeToAlarm.set(Calendar.MINUTE, minute)
-                goalDateTimeToAlarm.set(Calendar.SECOND, 0)
+
 
                 goalDate = tmpDate
                 val tmp = "Due on : $goalDate at $goalTime"
                 tvDateAndTime.text = tmp
+
+                Log.d("TAG:", " goaldatetime is " + goalDateTimeToAlarm.timeInMillis)
+
             }
             else {
 
