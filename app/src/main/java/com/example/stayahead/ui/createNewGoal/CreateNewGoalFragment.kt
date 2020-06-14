@@ -121,7 +121,13 @@ class CreateNewGoalFragment : Fragment() {
             val  cpTimeInMillis  = getCheckpointTimeInMillis(cpDate, cpTime)
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
                 Log.d("TAG:","Checkpoint in millis " + cpTimeInMillis + " ::  cp id " + ck.checkpointId)
-                createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
+
+                val pendingIntent = AlarmReceiver.createPendingIntent(root.context, ck.checkpointId, "checkpoint", newGoal.goalName, newGoal.goalId)
+
+                AlarmReceiver.createAlarmManager(root.context, pendingIntent, cpTimeInMillis)
+                //createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
+
+
             }
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
@@ -129,9 +135,12 @@ class CreateNewGoalFragment : Fragment() {
 
         }
 
-        if(sharedPreferences.getInt("send_goal",1) == 1)
-            createAlarmManager(newGoal.goalId,"goal",goalDateTimeToAlarm.timeInMillis)
+        if(sharedPreferences.getInt("send_goal",1) == 1) {
+            val pendingIntent = AlarmReceiver.createPendingIntent(root.context, newGoal.goalId, "goal", newGoal.goalName, newGoal.goalId)
 
+            AlarmReceiver.createAlarmManager(root.context, pendingIntent, goalDateTimeToAlarm.timeInMillis)
+            //createAlarmManager(newGoal.goalId, "goal", goalDateTimeToAlarm.timeInMillis)
+        }
         db.addGoalData(newGoal)
         parentFragmentManager.popBackStack()
     }
@@ -150,14 +159,12 @@ class CreateNewGoalFragment : Fragment() {
         return cpDateTimeToAlarm.timeInMillis
     }
 
-    private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
+    /*private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
         Log.d("TAG:", " CAM: time is " + time + " s "+ typeValue)
         val pendingIntent = createPendingIntent(resultCode,typeValue)
         val am = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         //am.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent)
-        am.setRepeating(AlarmManager.RTC_WAKEUP, time, 6000,pendingIntent)
-
-
+        am.setRepeating(AlarmManager.RTC_WAKEUP, time, time,pendingIntent)
     }
     private fun createPendingIntent(resultCode:Int, typeValue:String) : PendingIntent{
         val notifyIntent = Intent(root.context, AlarmReceiver::class.java)
@@ -168,7 +175,7 @@ class CreateNewGoalFragment : Fragment() {
         return PendingIntent.getBroadcast(root.context, resultCode,
             notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
-
+    */
     private fun removeItemDialog(tr: TableRow){
         val dialog = AlertDialog.Builder(root.context)
         dialog.setTitle("Delete Checkpoint")
