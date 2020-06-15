@@ -107,7 +107,7 @@ class StatsFragment : Fragment() {
         pieDataSet.colors = listOf(root.context.resources.getColor(R.color.colorAccentLight5),root.context.resources.getColor(R.color.colorPrimaryLight5),root.context.resources.getColor(R.color.colorPrimary5))
 
         val pieData = PieData(pieDataSet)
-        pieChart.setEntryLabelTextSize(0f)
+
         pieChart.data = pieData
         pieChart.animateY(1400, Easing.EaseInOutQuad)
 
@@ -159,7 +159,7 @@ class StatsFragment : Fragment() {
         val pieEntryList = listOf<PieEntry>(PieEntry( (totalFinished),"Finished"),PieEntry( (totalActive),"Incomplete"))
 
         val pieDataSet = PieDataSet(pieEntryList,"")
-
+        pieChart.setEntryLabelTextSize(0f)
         val legend = pieChart.legend
         legend.isWordWrapEnabled = true
         legend.form = Legend.LegendForm.SQUARE
