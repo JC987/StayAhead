@@ -76,7 +76,7 @@ class StatsFragment : Fragment() {
         var num100 = 0
         var num50 = 0
         var num0 = 0
-        val c = db.getFinishedGoals()
+        val c = db.getFinishedGoals(false)
         while(c.moveToNext()){
             if(c.getString(2).toFloat() == 100f){
                 num100++
@@ -150,8 +150,8 @@ class StatsFragment : Fragment() {
 
     fun defChart(){
         val db = DatabaseHelper(root.context)
-        val totalFinished = db.getFinishedGoals().count.toFloat()
-        val totalActive = db.getAllGoalData(false).count.toFloat()
+        val totalFinished = db.getFinishedGoals(false).count.toFloat()
+        val totalActive = db.getActiveGoalsData(false).count.toFloat()
         val total = (totalActive + totalFinished)
 
         pieChart.holeRadius = 25f

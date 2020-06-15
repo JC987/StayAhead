@@ -79,9 +79,9 @@ class HomeFragment : Fragment() {
         Log.d("TAG", "HF:: on resume")
         lateinit var cursor:Cursor
         when(sortKey){
-            0 -> cursor = db.getAllGoalData(false)
-            1 -> cursor = db.getAllGoalData(true)
-            2 -> cursor = db.getAllGoalDataByDate()
+            0 -> cursor = db.getActiveGoalsData(false)
+            1 -> cursor = db.getActiveGoalsData(true)
+            2 -> cursor = db.getActiveGoalsDataByDate()
         }
 
         val editor:SharedPreferences.Editor = sharedPreferences.edit()

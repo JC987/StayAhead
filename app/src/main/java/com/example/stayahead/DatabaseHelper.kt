@@ -169,9 +169,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         db.execSQL("UPDATE $GOAL_TABLE_NAME SET $GOAL_COL5 = 1 WHERE ID = $goalId")
     }
 
-    fun getFinishedGoals(): Cursor{
+    fun getFinishedGoals(desc:Boolean): Cursor{
         val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL5 = 1", null)
+        return if(desc)
+            db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL5 = 1 ORDER BY id DESC", null)
+        else
+            db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME  WHERE $GOAL_COL5 = 1 ORDER BY id ASC", null)
+
+    }
+
+    fun getFinishedGoalsDataByDate(): Cursor {
+        val db = this.writableDatabase
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 1 ORDER BY $GOAL_COL3, id DESC" , null)
     }
 
     fun deleteGoal(goalId:Int){
@@ -186,7 +195,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     }
 
 
-    fun getAllGoalData(desc: Boolean): Cursor {
+    fun getActiveGoalsData(desc: Boolean): Cursor {
         val db = this.writableDatabase
         return if (desc) db.rawQuery(
             "SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY id DESC",
@@ -195,9 +204,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
 
     }
 
-    fun getAllGoalDataByDate(): Cursor {
+    fun getActiveGoalsDataByDate(): Cursor {
         val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3 DESC" , null)
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3, id DESC" , null)
     }
 
     fun getAllCheckpointData(desc: Boolean): Cursor {

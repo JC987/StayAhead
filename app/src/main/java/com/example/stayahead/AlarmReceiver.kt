@@ -18,7 +18,7 @@ class AlarmReceiver : BroadcastReceiver() {
         if(p1?.action.equals(Intent.ACTION_BOOT_COMPLETED)){
             Log.d(TAG,"boot completed")
             val db = DatabaseHelper(p0!!)
-            val cursor = db.getAllGoalData(false)
+            val cursor = db.getActiveGoalsData(false)
             val d = Calendar.getInstance().time
 
             while(cursor.moveToNext()){
