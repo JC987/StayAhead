@@ -46,7 +46,9 @@ class DetailedGoalActivity : AppCompatActivity() {
 
         tvGoalName.text = (goal.goalName)
         tvDueDate.text = "Due: ${goal.date}"
-        if(intent.getBooleanExtra("goal_finished", false)) {
+
+
+        if(goal.isFinished) {
             tvFinished.text = "Completed"
             isFinished = true
             Log.d("TAG:", "detailed:: goal finished true")
@@ -58,22 +60,14 @@ class DetailedGoalActivity : AppCompatActivity() {
     }
 
     private fun loadCurrentGoalData(){
-        //goalId = intent.getIntExtra("goal_id",-1)
 
-        if(intent.getIntExtra("is_notification",0) == 0){
-            goal = Goal(intent.getStringExtra("goal_name"), intent.getStringExtra("goal_percent"),
-                intent.getStringExtra("goal_due_date"),"",false, intent.getIntExtra("goal_id",-1))
-            Log.d(TAG,"Not coming from a notification")
-
-        }
-        else{
             val goalCursor = db.getGoal(intent.getIntExtra("goal_id",-1))
             goalCursor.moveToFirst()
             goal = Goal(goalCursor.getString(1), goalCursor.getString(2),
-                goalCursor.getString(3),"",false, intent.getIntExtra("goal_id",-1))
+                goalCursor.getString(3), goalCursor.getString(4), (goalCursor.getInt(5)==1), intent.getIntExtra("goal_id",-1))
 
             clearNotification()
-        }
+
     }
 
     private fun loadCreatedCheckpoints() {
@@ -154,11 +148,36 @@ class DetailedGoalActivity : AppCompatActivity() {
             tableRow.addView(cbCheckpoint)
             tableRow.addView(tvCheckpointDate)
 
+            tableRow.setOnLongClickListener {
+                val t = convertTimeTo12Hour(currentCheckpoint.time)
+                Toast.makeText(this,"Due on ${goal.date} at $t",Toast.LENGTH_SHORT).show()
+                true
+            }
             tableRow.setPadding(16,32,16,32)
 
             tableLayout.addView(tableRow)
 
         }
+    }
+
+    private fun convertTimeTo12Hour(time: String): String{
+        val arr = time.split(":")
+
+        var timeOfDay = "AM"
+        if(arr[0].toInt() > 11){
+            timeOfDay = "PM"
+        }
+        val df = DecimalFormat("00")
+
+        val hour = if(arr[0] != "12")
+            (df.format(arr[0].toInt()).toInt() % 12 ).toString()
+        else
+            "12"
+
+        val min = df.format(arr[1].toInt()).toString()
+
+        return "$hour : $min $timeOfDay"
+
     }
 
     private fun createFinishDialog() {

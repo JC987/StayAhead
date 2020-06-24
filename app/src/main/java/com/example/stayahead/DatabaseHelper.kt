@@ -206,7 +206,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
 
     fun getActiveGoalsDataByDate(): Cursor {
         val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3, id DESC" , null)
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3 DESC, id DESC" , null)
     }
 
     fun getAllCheckpointData(desc: Boolean): Cursor {

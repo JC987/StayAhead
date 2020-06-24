@@ -47,7 +47,7 @@ class CreateNewGoalFragment : Fragment() {
     private var limit:Int = 0
     private var hour:Int = 0
     private var minute:Int = 0
-    val goalDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
+    private val goalDateTimeToAlarm: Calendar = Calendar.getInstance(Locale.getDefault())
     private val TAG = "CreateNewGoalFragment:"
     private var goalDate = "-"
     private var goalTime = "-"
@@ -59,6 +59,7 @@ class CreateNewGoalFragment : Fragment() {
         toolsViewModel =
             ViewModelProviders.of(this).get(CreateNewGoalViewModel::class.java)
         root = inflater.inflate(R.layout.fragment_create_new_goal, container, false)
+        retainInstance = true
         sharedPreferences = root.context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         hour = sharedPreferences.getInt("notification_time_hour",9)
         minute = sharedPreferences.getInt("notification_time_minute",0)
