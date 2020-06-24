@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditGoalActivity"></activity>
+        <activity android:name=".EditGoalActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
         <receiver android:name="com.example.stayahead.AlarmReceiver"
             android:enabled="true"
             android:exported="false" >
@@ -21,7 +21,8 @@
         </receiver>
         <activity
             android:name=".SideNavDrawer"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
