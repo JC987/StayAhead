@@ -50,8 +50,5 @@ class SideNavDrawer : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    fun getContext(): Context {
-        return this
-    }
 
 }

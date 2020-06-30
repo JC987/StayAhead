@@ -1,8 +1,6 @@
 package com.example.stayahead
 
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,7 +14,6 @@ import android.widget.*
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.min
 
 class EditGoalActivity : AppCompatActivity() {
     private lateinit var  layout :LinearLayout
@@ -65,7 +62,7 @@ class EditGoalActivity : AppCompatActivity() {
 
         val checkpointCursor = db.getAllCheckpointsOfGoal(currentGoal.goalId)
         while(checkpointCursor.moveToNext()){
-            val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null)
+            val linearLayout = layoutInflater.inflate(R.layout.checkpoint_list_item, null)
             val linearLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             linearLayoutParams.setMargins(16,16,16,16)
             linearLayout.layoutParams = linearLayoutParams
@@ -114,12 +111,13 @@ class EditGoalActivity : AppCompatActivity() {
         Log.d("TAG",goalCursor.getString(1))
         Log.d("TAG",goalCursor.getString(3))
         etGoalName.setText(goalCursor.getString(1))
-        var tmp = goalCursor.getString(4).split(":")
-        hour = tmp[0].toInt()
-        minute = tmp[1].toInt()
+        val split = goalCursor.getString(4).split(":")
+        hour = split[0].toInt()
+        minute = split[1].toInt()
 
         currentGoal = Goal(goalCursor.getString(1),"",goalCursor.getString(3), goalCursor.getString(4),false, intent.getIntExtra("goal_id",1))
-        tvGoalDateAndTime.text = "Due on : ${currentGoal.date} at ${currentGoal.time}"
+        val tmp = "Due on : ${currentGoal.date} at ${currentGoal.time}"
+        tvGoalDateAndTime.text = tmp
     }
 
     private fun loadViewData(){
@@ -150,14 +148,13 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
     private fun createNewCheckpoint(){
-        val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null)
+        val linearLayout = layoutInflater.inflate(R.layout.checkpoint_list_item, null)
         val linearLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         linearLayoutParams.setMargins(16,16,16,16)
         linearLayout.layoutParams = linearLayoutParams
         linearLayout.background = this.getDrawable(R.drawable.dashed_full_border)
         linearLayout.setPadding(8,16,8,16)
 
-        val editText = linearLayout.findViewById<EditText>(R.id.etEditCheckpointName)
         val btnDate = linearLayout.findViewById<Button>(R.id.btnCheckpointDate)
         val btnTime = linearLayout.findViewById<Button>(R.id.btnCheckpointTime)
 
@@ -234,9 +231,9 @@ class EditGoalActivity : AppCompatActivity() {
         val tp = view.findViewById<TimePicker>(R.id.timePicker)
         dialog.setView(view)
         dialog.setTitle("Time Picker")
-        var tpHour = hour
-        var tpMin = minute
-        var tmpTime = ""
+        var tpHour: Int
+        var tpMin: Int
+        var tmpTime: String
         dialog.setPositiveButton("Confirm"){ _,_ ->
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                 Toast.makeText(this, "TP: " + tp.hour + " : " + tp.minute, Toast.LENGTH_SHORT).show()
@@ -376,29 +373,5 @@ class EditGoalActivity : AppCompatActivity() {
         cpDateTimeToAlarm.set(Calendar.SECOND, 0)
         return cpDateTimeToAlarm.timeInMillis
     }
-/*
-    private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
-        val pendingIntent = createPendingIntent(resultCode,typeValue,false)
-        val am = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.setExact(AlarmManager.RTC_WAKEUP,time, pendingIntent)
-    }
-    private fun updateAlarmManager(resultCode:Int, typeValue: String, time:Long){
-        Log.d("TAG:","update alarm manager")
-        val pendingIntent = createPendingIntent(resultCode,typeValue,true)
-        val am = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.setExact(AlarmManager.RTC_WAKEUP,time, pendingIntent)
-    }
-    private fun createPendingIntent(resultCode:Int, typeValue:String, update:Boolean) : PendingIntent {
-        Log.d("TAG:","create pending intent")
-        val notifyIntent = Intent(this, AlarmReceiver::class.java)
-        notifyIntent.putExtra("goal_name",currentGoal.goalName)
-        notifyIntent.putExtra("type",typeValue)
-        notifyIntent.putExtra("code",resultCode)
-        notifyIntent.putExtra("goal_id", currentGoal.goalId)
-        return if(!update)
-            PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_ONE_SHOT)
-        else
-            PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-*/
+
 }

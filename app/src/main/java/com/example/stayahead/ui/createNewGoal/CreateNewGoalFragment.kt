@@ -1,38 +1,22 @@
 package com.example.stayahead.ui.createNewGoal
 
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Resources
-import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.view.children
-import androidx.core.view.marginLeft
-import androidx.core.view.marginStart
-import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.stayahead.*
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_create_new_goal.*
-import java.sql.Time
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.random.Random.Default.nextInt
 
 class CreateNewGoalFragment : Fragment() {
 
@@ -72,7 +56,6 @@ class CreateNewGoalFragment : Fragment() {
         tvDateAndTime = root.findViewById(R.id.tvDueDate)
         layout = root.findViewById(R.id.lvCheckpoints)
         cpList = ArrayList()
-        //layout.setBackgroundColor(Color.LTGRAY)
 
         btnDueDate.setOnClickListener {
             datePickerDialog(btnDueDate)
@@ -162,23 +145,6 @@ class CreateNewGoalFragment : Fragment() {
         return cpDateTimeToAlarm.timeInMillis
     }
 
-    /*private fun createAlarmManager(resultCode:Int, typeValue: String, time:Long){
-        Log.d("TAG:", " CAM: time is " + time + " s "+ typeValue)
-        val pendingIntent = createPendingIntent(resultCode,typeValue)
-        val am = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        //am.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent)
-        am.setRepeating(AlarmManager.RTC_WAKEUP, time, time,pendingIntent)
-    }
-    private fun createPendingIntent(resultCode:Int, typeValue:String) : PendingIntent{
-        val notifyIntent = Intent(root.context, AlarmReceiver::class.java)
-        notifyIntent.putExtra("goal_name",newGoal.goalName)
-        notifyIntent.putExtra("type",typeValue)
-        notifyIntent.putExtra("code",resultCode)
-        notifyIntent.putExtra("goal_id", newGoal.goalId)
-        return PendingIntent.getBroadcast(root.context, resultCode,
-            notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-    */
     private fun removeItemDialog(tr: TableRow){
         val dialog = AlertDialog.Builder(root.context)
         dialog.setTitle("Delete Checkpoint")
@@ -299,14 +265,13 @@ class CreateNewGoalFragment : Fragment() {
     }
 
     private fun createCheckpoint(){
-        val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null)
+        val linearLayout = layoutInflater.inflate(R.layout.checkpoint_list_item, null)
         val linearLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         linearLayoutParams.setMargins(16,16,16,16)
         linearLayout.layoutParams = linearLayoutParams
         linearLayout.background = root.context.getDrawable(R.drawable.dashed_full_border)
         linearLayout.setPadding(8,16,8,16)
 
-        val editText = linearLayout.findViewById<EditText>(R.id.etEditCheckpointName)
         val btnDate = linearLayout.findViewById<Button>(R.id.btnCheckpointDate)
         val btnTime = linearLayout.findViewById<Button>(R.id.btnCheckpointTime)
 
@@ -323,61 +288,4 @@ class CreateNewGoalFragment : Fragment() {
         layout.addView(linearLayout)
     }
 
-   /* private fun createCheckpoint(){
-        val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null) as LinearLayout //LinearLayout(root.context)
-        val linearLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT,1f)
-        //linearLayout.orientation = LinearLayout.VERTICAL
-
-        val linearLayoutButtons = LinearLayout(root.context)
-        val linearLayoutButtonsParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
-        //linearLayoutButtons.orientation = LinearLayout.HORIZONTAL
-
-        val tableRow = TableRow(root.context)
-        val trParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,TableLayout.LayoutParams.WRAP_CONTENT,1f)
-        //trParams.setMargins(32,32,32,32)
-        val etParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-        val editText = EditText(root.context)
-       // etParams.setMargins(32,32,32,32)
-        val btnDateCk =  Button(root.context)//Button(ContextThemeWrapper(root.context, R.style.Widget_MaterialComponents_Button_OutlinedButton))
-        val btnParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        val btnTimeCk =  Button(root.context)//Button(ContextThemeWrapper(root.context, R.style.Widget_MaterialComponents_Button_OutlinedButton))
-        val btnTimeParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-
-        // btnParams.setMargins(32,32,32,32)
-        //tableRow.setBackgroundColor(Color.WHITE)
-
-        btnDateCk.setOnClickListener {
-            datePickerDialog(btnDateCk)
-        }
-
-        tableRow.layoutParams = trParams
-
-        btnDateCk.text = "Date"
-        btnTimeCk.text = "Time"
-        //btnDateCk.setBackgroundResource( root.context.resources R.style.Widget_MaterialComponents_Button_OutlinedButton
-        //btnDateCk.setBackgroundColor(Color.parseColor("#f0f0f0"))
-        //btnDateCk.setTextColor(root.context.getResources().getColor(R.color.colorPrimaryDark5))
-        //btnDateCk.setBackgroundResource(R.drawable.full_border)
-        btnDateCk.layoutParams = btnParams
-        btnTimeCk.layoutParams = btnTimeParams
-
-        editText.layoutParams = etParams
-        editText.hint = "Enter a checkpoint!"
-        editText.setPadding(32,8,32,64)
-
-        //linearLayout.layoutParams = linearLayoutParams
-        linearLayoutButtons.layoutParams = linearLayoutButtonsParams
-
-        linearLayoutButtons.setBackgroundColor(Color.GREEN)
-
-        layout.addView(linearLayout)
-      //  val linearList = listOf<LinearLayout>(linearLayout)
-
-        //val adapter = ArrayAdapter<LinearLayout>(root.context,R.layout.test_list_view_item, linearList)
-
-        //layout.adapter = adapter
-        //layout.addView(linearLayout)
-        cpList.add(tableRow)
-
-    }*/
 }

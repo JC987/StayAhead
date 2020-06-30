@@ -1,15 +1,11 @@
 package com.example.stayahead
 
 import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.database.Cursor
-import android.database.CursorIndexOutOfBoundsException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import android.database.DatabaseUtils
-import java.sql.Date
 
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NAME, null, 1) {
@@ -48,6 +44,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
     }
 
 
+    fun getGoal(goalId: Int): Cursor {
+        val db = this.writableDatabase
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE ID = $goalId", null)
+    }
+
     fun addGoalData(goal: Goal): Boolean {
         val db = this.writableDatabase
         val contentValues = ContentValues()
@@ -74,6 +75,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
             return 0
         return c.getInt(0)
     }
+
+    fun getActiveGoalsData(desc: Boolean): Cursor {
+        val db = this.writableDatabase
+        return if (desc) db.rawQuery(
+            "SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY id DESC",
+            null
+        ) else db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0" , null)
+
+    }
+
+    fun getActiveGoalsDataByDate(): Cursor {
+        val db = this.writableDatabase
+        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3 DESC, id DESC" , null)
+    }
+
+    fun getAllCheckpointData(desc: Boolean): Cursor {
+        val db = this.writableDatabase
+        return if (desc) db.rawQuery(
+            "SELECT * FROM $CHECKPOINT_TABLE_NAME ORDER BY id DESC",
+            null
+        ) else db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME", null)
+
+    }
+
+
     fun getCheckpointDBCount(): Int{
         val db = this.writableDatabase
         val c = db.rawQuery("SELECT seq FROM SQLITE_SEQUENCE WHERE name = '$CHECKPOINT_TABLE_NAME'",null)
@@ -83,21 +109,21 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
             return 0
         return c.getInt(0)
     }
-    fun getCheckpointsForGoal(id: Int): Cursor{
+
+    fun getAllCheckpointsOfGoal(goalId: Int): Cursor{
         val db = this.writableDatabase
-        val c = db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $id",null)
-        return c
+        return db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $goalId", null)
     }
 
     fun getNumberOFCheckpointsCompleted(): Int{
         val db = this.writableDatabase
-        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL5 = 1",null)
+        val c = db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL5 = 1",null)
         c.moveToFirst()
         return c.getInt(0)
     }
     fun getNumberOFCheckpointsFailed(): Int{
         val db = this.writableDatabase
-        val c= db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL5 = 0",null)
+        val c = db.rawQuery("SELECT COUNT(id) FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL5 = 0",null)
         c.moveToFirst()
         return c.getInt(0)
     }
@@ -190,48 +216,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         db.execSQL("DELETE FROM $GOAL_TABLE_NAME WHERE ID = $goalId")
         //db.close()
     }
-    fun deleteAllCheckpointsForGoal(goalId:Int){
 
-    }
-
-
-    fun getActiveGoalsData(desc: Boolean): Cursor {
-        val db = this.writableDatabase
-        return if (desc) db.rawQuery(
-            "SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY id DESC",
-            null
-        ) else db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0" , null)
-
-    }
-
-    fun getActiveGoalsDataByDate(): Cursor {
-        val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE $GOAL_COL5 = 0 ORDER BY $GOAL_COL3 DESC, id DESC" , null)
-    }
-
-    fun getAllCheckpointData(desc: Boolean): Cursor {
-        val db = this.writableDatabase
-        return if (desc) db.rawQuery(
-            "SELECT * FROM $CHECKPOINT_TABLE_NAME ORDER BY id DESC",
-            null
-        ) else db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME", null)
-
-    }
-
-    fun getGoal(goalId: Int): Cursor {
-        val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $GOAL_TABLE_NAME WHERE ID = $goalId", null)
-    }
-
-    fun getAllCheckpointsOfGoal(goalId: Int): Cursor{
-        val db = this.writableDatabase
-        return db.rawQuery("SELECT * FROM $CHECKPOINT_TABLE_NAME WHERE $CHECKPOINT_COL2 = $goalId", null)
-    }
-
-    fun closeDatabase(){
-        val db = this.writableDatabase
-        db.close()
-    }
 
     fun truncateTables() {
         val db = this.writableDatabase

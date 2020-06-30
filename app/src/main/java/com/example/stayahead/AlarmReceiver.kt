@@ -114,16 +114,6 @@ class AlarmReceiver : BroadcastReceiver() {
             return PendingIntent.getBroadcast(context.applicationContext, resultCode,
                 notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
-      /*  fun updatePendingIntent(context: Context, resultCode:Int, typeValue:String, goalName:String, goalId: Int) : PendingIntent {
-            val notifyIntent = Intent(this, AlarmReceiver::class.java)
-            notifyIntent.putExtra("goal_name",currentGoal.goalName)
-            notifyIntent.putExtra("type",typeValue)
-            notifyIntent.putExtra("code",resultCode)
-            notifyIntent.putExtra("goal_id", currentGoal.goalId)
-            return
-                PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        }*/
 
         }
     

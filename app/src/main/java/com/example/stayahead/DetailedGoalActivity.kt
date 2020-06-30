@@ -78,7 +78,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         cbParams.setMargins(0,32,0,32)
         val tbParams = TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT,5f)
         tbParams.setMargins(32,32,32,32)
-        val cursor = db.getCheckpointsForGoal(intent.getIntExtra("goal_id",0))
+        val cursor = db.getAllCheckpointsOfGoal(intent.getIntExtra("goal_id",0))
         
         while(cursor.moveToNext()){
             Log.d("TAG","    :" + cursor.count +"   c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4))
