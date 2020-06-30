@@ -61,7 +61,7 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         )
 
         notificationBuilder.setContentIntent(contentIntent)
-
+        notificationBuilder.setAutoCancel(true)
 
         return notificationBuilder
     }
@@ -75,7 +75,7 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         notificationBuilder.setContentTitle("Your checkpoint for $title is due today")
         notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         notificationBuilder.setPriority(NotificationCompat.PRIORITY_HIGH)
-        Log.d("NotificationHelper","create goal notification")
+        Log.d("NotificationHelper","create cp notification $code")
         val notificationIntent = Intent(this, DetailedGoalActivity::class.java)
         notificationIntent.putExtra("is_notification",1)
         notificationIntent.putExtra("is_checkpoint",1)
@@ -83,11 +83,12 @@ class NotificationHelper(val context:Context): ContextWrapper(context) { // cont
         notificationIntent.putExtra("checkpoint_id", code)
         val contentIntent = PendingIntent.getActivity(
             this,
-            code + 100000,
+            code,
             notificationIntent,
             PendingIntent.FLAG_ONE_SHOT
         )
         notificationBuilder.setContentIntent(contentIntent)
+        notificationBuilder.setAutoCancel(true)
 
         return notificationBuilder
     }

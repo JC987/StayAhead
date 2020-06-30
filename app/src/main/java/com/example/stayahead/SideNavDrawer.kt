@@ -1,5 +1,6 @@
 package com.example.stayahead
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import androidx.navigation.findNavController
@@ -48,4 +49,9 @@ class SideNavDrawer : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+    fun getContext(): Context {
+        return this
+    }
+
 }

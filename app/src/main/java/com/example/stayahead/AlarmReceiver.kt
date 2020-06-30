@@ -68,7 +68,7 @@ class AlarmReceiver : BroadcastReceiver() {
             else if (p1?.getStringExtra("type") == "checkpoint") {
                 Log.d(TAG, "type = checkpoint")
                 notificationHelper.getManager().notify(
-                    p1!!.getIntExtra("code", 0) + 100000,
+                    p1!!.getIntExtra("code", 0),
                     notificationHelper.createCheckpointReminderNotification(
                         p1.getStringExtra("goal_name"),
                         p1.getIntExtra("code", 0), p1.getIntExtra("goal_id", 0)
@@ -98,20 +98,21 @@ class AlarmReceiver : BroadcastReceiver() {
 
     companion object{
         fun createAlarmManager(context: Context, pendingIntent: PendingIntent,time:Long){
-            Log.d("AlarmReceiver", "companion CAM: time is " + time )
+            Log.d("AlarmReceiver", "companion CAM: time is " + time)
             val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             //am.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent)
             am.setRepeating(AlarmManager.RTC_WAKEUP, time, time,pendingIntent)
         }
+
         fun createPendingIntent(context: Context, resultCode:Int, typeValue:String, goalName:String, goalId: Int) : PendingIntent{
             Log.d("AlarmReceiver","code $resultCode  type $typeValue  name $goalName")
-            val notifyIntent = Intent(context, AlarmReceiver::class.java)
+            val notifyIntent = Intent(context.applicationContext, AlarmReceiver::class.java)
             notifyIntent.putExtra("goal_name",goalName)
             notifyIntent.putExtra("type",typeValue)
             notifyIntent.putExtra("code",resultCode)
             notifyIntent.putExtra("goal_id", goalId)
-            return PendingIntent.getBroadcast(context, resultCode,
-                notifyIntent, PendingIntent.FLAG_ONE_SHOT)
+            return PendingIntent.getBroadcast(context.applicationContext, resultCode,
+                notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
       /*  fun updatePendingIntent(context: Context, resultCode:Int, typeValue:String, goalName:String, goalId: Int) : PendingIntent {
             val notifyIntent = Intent(this, AlarmReceiver::class.java)

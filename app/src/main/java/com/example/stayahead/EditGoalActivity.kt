@@ -291,7 +291,7 @@ class EditGoalActivity : AppCompatActivity() {
             val ck = Checkpoint(et.text.toString(),cpDate,cpTime,false, currentGoal.goalId,db.getCheckpointDBCount()+1)
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
                 //createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
-                val pendingIntent = AlarmReceiver.createPendingIntent(this, ck.checkpointId, "checkpoint", currentGoal.goalName, currentGoal.goalId)
+                val pendingIntent = AlarmReceiver.createPendingIntent(this, ck.checkpointId + 100000, "checkpoint", currentGoal.goalName, currentGoal.goalId)
                 AlarmReceiver.createAlarmManager(this, pendingIntent,cpTimeInMillis)
             }
             db.addCheckpointData(ck)
@@ -316,7 +316,7 @@ class EditGoalActivity : AppCompatActivity() {
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
                 Log.d("TAG:","send goal update alarm manager " + currentGoal.goalId + "  " + goalDateTimeToAlarm.timeInMillis)
 
-                val pendingIntent = AlarmReceiver.createPendingIntent(this,ck.checkpointId,"checkpoint", currentGoal.goalName, currentGoal.goalId)
+                val pendingIntent = AlarmReceiver.createPendingIntent(this,ck.checkpointId + 100000,"checkpoint", currentGoal.goalName, currentGoal.goalId)
                 AlarmReceiver.createAlarmManager(this, pendingIntent, cpTimeInMillis)
                 //updateAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
             }

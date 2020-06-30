@@ -66,7 +66,7 @@ class DetailedGoalActivity : AppCompatActivity() {
             goal = Goal(goalCursor.getString(1), goalCursor.getString(2),
                 goalCursor.getString(3), goalCursor.getString(4), (goalCursor.getInt(5)==1), intent.getIntExtra("goal_id",-1))
 
-            clearNotification()
+            //clearNotification()
 
     }
 
@@ -266,7 +266,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         notifyIntent.putExtra("type",type)
         notifyIntent.putExtra("code",resultCode)
         notifyIntent.putExtra("goal_id", goal.goalId)
-        return  PendingIntent.getBroadcast(this, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        return  PendingIntent.getBroadcast(applicationContext, resultCode, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT)
      }
 
     private fun cancelAlarmManagers(){
@@ -276,7 +276,7 @@ class DetailedGoalActivity : AppCompatActivity() {
         alarmManagerGoal.cancel(pendingIntentGoal)
 
         updatedCheckpoints.forEach {
-            val pendingIntentCheckpoint = createPendingIntent(it.key,"checkpoint")
+            val pendingIntentCheckpoint = createPendingIntent(it.key + 100000,"checkpoint")
             val alarmManagerCheckpoint = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmManagerCheckpoint.cancel(pendingIntentCheckpoint)
         }
@@ -288,7 +288,8 @@ class DetailedGoalActivity : AppCompatActivity() {
             nh.cancelNotification(goal.goalId)
         }
         else{
-            nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
+            Log.d("Alarmreceiver"," detail cp ${intent.getIntExtra("checkpoint_id",0)}")
+            nh.getManager().cancel(intent.getIntExtra("checkpoint_id",0))
         }
     }
 
@@ -297,7 +298,8 @@ class DetailedGoalActivity : AppCompatActivity() {
         nh.cancelNotification(goal.goalId)
 
         updatedCheckpoints.forEach {
-            nh.cancelNotification(it.key + 100000)
+            Log.d("alarmreceiver", " from detailed clear all noti  ${(it.key+100000)}")
+            nh.cancelNotification((it.key + 100000))
         }
         //nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
 

@@ -1,5 +1,6 @@
 package com.example.stayahead.ui.settings
 
+import android.app.AlarmManager
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -13,8 +14,7 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.stayahead.DatabaseHelper
-import com.example.stayahead.R
+import com.example.stayahead.*
 
 class SettingsFragment : Fragment() {
 
@@ -116,14 +116,42 @@ class SettingsFragment : Fragment() {
         dialog.setMessage("Clear all saved data! Can not be undone! Are you sure you want to continue?")
         dialog.setPositiveButton("Yes") { dialogInterface, i ->
             Toast.makeText(root.context,"Deleting data",Toast.LENGTH_SHORT).show()
+            cancelAlarmManagers()
+            clearAllNotification()
             val db = DatabaseHelper(root.context)
             db.truncateTables()
+
+
         }
         dialog.setNegativeButton("No"){ dialogInterface, i ->
             //Toast.makeText(root.context, "NOO",Toast.LENGTH_SHORT).show();
         }
         dialog.create()
         dialog.show()
+    }
+
+    private fun clearAllNotification(){
+        val nh = NotificationHelper(root.context)
+        nh.getManager().cancelAll()
+    }
+
+    private fun cancelAlarmManagers(){
+        val db = DatabaseHelper(root.context)
+        val cursor = db.getActiveGoalsData(false)
+        while(cursor.moveToNext()){
+            val currentGoal = Goal(cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),false,cursor.getInt(0))
+            val pendingIntentGoal = AlarmReceiver.createPendingIntent(root.context, currentGoal.goalId, "goal", currentGoal.goalName, currentGoal.goalId)
+            val alarmManagerGoal = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManagerGoal.cancel(pendingIntentGoal)
+
+            val checkpointCursor = db.getAllCheckpointsOfGoal(currentGoal.goalId)
+            while(checkpointCursor.moveToNext()){
+                val checkpoint = Checkpoint(checkpointCursor.getString(1),checkpointCursor.getString(3),checkpointCursor.getString(4), false, checkpointCursor.getInt(2),checkpointCursor.getInt(0))
+                val pendingIntentCheckpoint = AlarmReceiver.createPendingIntent(root.context, checkpoint.checkpointId + 100000, "checkpoint", currentGoal.goalName, currentGoal.goalId)
+                val alarmManagerCheckpoint = root.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                alarmManagerCheckpoint.cancel(pendingIntentCheckpoint)
+            }
+        }
     }
 
     private fun createTimePickerDialog(){

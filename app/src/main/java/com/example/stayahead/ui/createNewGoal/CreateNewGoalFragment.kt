@@ -123,7 +123,7 @@ class CreateNewGoalFragment : Fragment() {
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
                 Log.d("TAG:","Checkpoint in millis " + cpTimeInMillis + " ::  cp id " + ck.checkpointId)
 
-                val pendingIntent = AlarmReceiver.createPendingIntent(root.context, ck.checkpointId, "checkpoint", newGoal.goalName, newGoal.goalId)
+                val pendingIntent = AlarmReceiver.createPendingIntent(root.context, ck.checkpointId + 100000, "checkpoint", newGoal.goalName, newGoal.goalId)
 
                 AlarmReceiver.createAlarmManager(root.context, pendingIntent, cpTimeInMillis)
                 //createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
