@@ -144,6 +144,8 @@ class CreateNewGoalFragment : Fragment() {
         }
         db.addGoalData(newGoal)
         parentFragmentManager.popBackStack()
+
+        db.close()
     }
 
     private fun getCheckpointTimeInMillis(checkpointDate:String, checkpointTime: String):Long{

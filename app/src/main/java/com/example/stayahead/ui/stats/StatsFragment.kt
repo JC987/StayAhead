@@ -113,6 +113,7 @@ class StatsFragment : Fragment() {
 
         pieChart.invalidate()
 
+        db.close()
     }
 
     fun checkpointStats(){
@@ -146,6 +147,7 @@ class StatsFragment : Fragment() {
         pieChart.animateY(1400, Easing.EaseInOutQuad)
         pieChart.invalidate()
 
+        db.close()
     }
 
     fun defChart(){
@@ -176,5 +178,7 @@ class StatsFragment : Fragment() {
         pieChart.data = pieData
         pieChart.animateY(1400, Easing.EaseInOutQuad)
         pieChart.invalidate()
+
+        db.close()
     }
 }

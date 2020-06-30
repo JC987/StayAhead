@@ -327,6 +327,7 @@ class DetailedGoalActivity : AppCompatActivity() {
 
     override fun finish() {
         Log.d("TAG", "on finish called")
+        db.close()
         super.finish()
 
     }

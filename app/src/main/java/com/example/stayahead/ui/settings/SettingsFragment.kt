@@ -121,7 +121,7 @@ class SettingsFragment : Fragment() {
             val db = DatabaseHelper(root.context)
             db.truncateTables()
 
-
+            db.close()
         }
         dialog.setNegativeButton("No"){ dialogInterface, i ->
             //Toast.makeText(root.context, "NOO",Toast.LENGTH_SHORT).show();
@@ -152,6 +152,7 @@ class SettingsFragment : Fragment() {
                 alarmManagerCheckpoint.cancel(pendingIntentCheckpoint)
             }
         }
+        db.close()
     }
 
     private fun createTimePickerDialog(){

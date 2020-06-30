@@ -103,6 +103,8 @@ class HomeFragment : Fragment() {
         rvList.layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.VERTICAL, false)
         val adapter = GoalAdapter(listItems)
         rvList.adapter = adapter
+
+        db.close()
     }
 
 

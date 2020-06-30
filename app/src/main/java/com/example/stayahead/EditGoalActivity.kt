@@ -23,6 +23,7 @@ class EditGoalActivity : AppCompatActivity() {
     private lateinit var etGoalName: EditText
     private lateinit var tvGoalDateAndTime: TextView
     private lateinit var currentGoal: Goal
+    private var db = DatabaseHelper(this)
     private val oldCheckpoints = mutableMapOf<Int, LinearLayout>()
     private var newCheckpoints: ArrayList<LinearLayout> = ArrayList()
     private var isGoalDateChanged = false
@@ -61,7 +62,7 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
     private fun loadCheckpointData(){
-        val db = DatabaseHelper(this)
+
         val checkpointCursor = db.getAllCheckpointsOfGoal(currentGoal.goalId)
         while(checkpointCursor.moveToNext()){
             val linearLayout = layoutInflater.inflate(R.layout.test_list_view_item, null)
@@ -106,7 +107,7 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
     private fun loadGoalData(){
-        val db = DatabaseHelper(this)
+        //val db = DatabaseHelper(this)
         val goalCursor = db.getGoal(intent.getIntExtra("goal_id",1))
         goalCursor.moveToNext()
         Log.d("TAG","count is " + goalCursor.count)
@@ -272,7 +273,7 @@ class EditGoalActivity : AppCompatActivity() {
 
 
     private fun saveNewCheckpoints(){
-        val db = DatabaseHelper(this)
+        //val db = DatabaseHelper(this)
         Log.d("asdfasdf:", "time is "+ goalDateTimeToAlarm.timeInMillis);
         for (i:Int in 0 until newCheckpoints.size){
             val et =  newCheckpoints.get(i).getChildAt(0) as EditText
@@ -301,7 +302,7 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
     private fun savePreviousCheckpoints(){
-        val db = DatabaseHelper(this)
+        //val db = DatabaseHelper(this)
 
         oldCheckpoints.forEach{
             val id = it.key
@@ -325,7 +326,7 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
     private fun saveGoal(){
-        val db = DatabaseHelper(this)
+        //val db = DatabaseHelper(this)
         //TODO: debug for edge cases
         //calculate new goal percent
         val df = DecimalFormat("0.0")
@@ -356,6 +357,8 @@ class EditGoalActivity : AppCompatActivity() {
         Toast.makeText(this,"Goal Edited",Toast.LENGTH_SHORT).show()
         val i = Intent(this, SideNavDrawer::class.java)
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        db.close()
+
         startActivity(i)
     }
 
