@@ -145,14 +145,14 @@ class CreateNewGoalFragment : Fragment() {
         return cpDateTimeToAlarm.timeInMillis
     }
 
-    private fun removeItemDialog(tr: TableRow){
+    private fun removeItemDialog(item: LinearLayout){
         val dialog = AlertDialog.Builder(root.context)
         dialog.setTitle("Delete Checkpoint")
         dialog.setMessage("Do you want to delete this checkpoint")
         dialog.setPositiveButton( "Yes", DialogInterface.OnClickListener { dialogInterface, i ->
             Log.d(TAG, "Deleting a checkpoint row")
-            layout.removeView(tr)
-            cpList.remove(tr)
+            layout.removeView(item)
+            cpList.remove(item)
             Toast.makeText(root.context,"Deleted!",Toast.LENGTH_SHORT).show()
 
         })
@@ -281,6 +281,11 @@ class CreateNewGoalFragment : Fragment() {
 
         btnTime.setOnClickListener {
             timePickerDialog(btnTime)
+        }
+
+        linearLayout.setOnLongClickListener {
+            removeItemDialog(linearLayout as LinearLayout)
+            true
         }
 
         cpList.add((linearLayout as LinearLayout))

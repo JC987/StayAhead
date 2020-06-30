@@ -156,6 +156,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(CHECKPOINT_COL3,updatedCheckpoint.date)
         contentValues.put(CHECKPOINT_COL4,updatedCheckpoint.time)
         //TODO: UPDATE newTime
+        //TODO: Remove logs and toast, update package name, clean code
         val where = "ID = ?"
         db.update(CHECKPOINT_TABLE_NAME,contentValues,where,arrayOf(updatedCheckpoint.checkpointId.toString()))
         //db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL1 = '${newName}', $CHECKPOINT_COL3 = '${newDate}' WHERE ID = ${checkpointId}")
