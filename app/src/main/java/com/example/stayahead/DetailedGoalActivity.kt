@@ -51,7 +51,6 @@ class DetailedGoalActivity : AppCompatActivity() {
         if(goal.isFinished) {
             tvFinished.text = "Completed"
             isFinished = true
-            Log.d("TAG:", "detailed:: goal finished true")
         }
         else
             tvFinished.text = "Ongoing"
@@ -81,8 +80,6 @@ class DetailedGoalActivity : AppCompatActivity() {
         val cursor = db.getAllCheckpointsOfGoal(intent.getIntExtra("goal_id",0))
         
         while(cursor.moveToNext()){
-            Log.d("TAG","    :" + cursor.count +"   c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4))
-            //                                  name            date         time           completed       goal id         id
             val currentCheckpoint = Checkpoint(cursor.getString(1),cursor.getString(3),cursor.getString(4), (cursor.getInt(5) > 0), cursor.getInt(2), cursor.getInt(0))
             numOfCheckpoint++
 
@@ -218,9 +215,9 @@ class DetailedGoalActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.action_finish -> createFinishDialog()//Toast.makeText(this,"GOAL COMPLETED", Toast.LENGTH_LONG).show()
-            R.id.action_delete -> createDeleteDialog()//Toast.makeText(this,"GOAL deleted", Toast.LENGTH_LONG).show()
-            R.id.action_edit_goal -> editGoal()//Toast.makeText(this,"GOAL edited", Toast.LENGTH_LONG).show()
+            R.id.action_finish -> createFinishDialog()
+            R.id.action_delete -> createDeleteDialog()
+            R.id.action_edit_goal -> editGoal()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -288,7 +285,6 @@ class DetailedGoalActivity : AppCompatActivity() {
             nh.cancelNotification(goal.goalId)
         }
         else{
-            Log.d("Alarmreceiver"," detail cp ${intent.getIntExtra("checkpoint_id",0)}")
             nh.getManager().cancel(intent.getIntExtra("checkpoint_id",0))
         }
     }
@@ -298,7 +294,6 @@ class DetailedGoalActivity : AppCompatActivity() {
         nh.cancelNotification(goal.goalId)
 
         updatedCheckpoints.forEach {
-            Log.d("alarmreceiver", " from detailed clear all noti  ${(it.key+100000)}")
             nh.cancelNotification((it.key + 100000))
         }
         //nh.cancelNotification(intent.getIntExtra("checkpoint_id",0) + 100000)
@@ -307,7 +302,6 @@ class DetailedGoalActivity : AppCompatActivity() {
 
 
     override fun onPause() {
-        Log.d("TAG", "on PAUSED called")
         updatedCheckpoints.forEach{
             db.updateCheckpointCompleted(it.key,it.value)
         }
@@ -326,7 +320,6 @@ class DetailedGoalActivity : AppCompatActivity() {
     }
 
     override fun finish() {
-        Log.d("TAG", "on finish called")
         db.close()
         super.finish()
 

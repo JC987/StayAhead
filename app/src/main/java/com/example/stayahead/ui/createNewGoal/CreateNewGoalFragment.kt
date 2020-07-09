@@ -32,7 +32,7 @@ class CreateNewGoalFragment : Fragment() {
     private var hour:Int = 0
     private var minute:Int = 0
     private val goalDateTimeToAlarm: Calendar = Calendar.getInstance(Locale.getDefault())
-    private val TAG = "CreateNewGoalFragment:"
+    //private val TAG = "CreateNewGoalFragment:"
     private var goalDate = "-"
     private var goalTime = "-"
     override fun onCreateView(
@@ -48,7 +48,7 @@ class CreateNewGoalFragment : Fragment() {
         hour = sharedPreferences.getInt("notification_time_hour",9)
         minute = sharedPreferences.getInt("notification_time_minute",0)
         limit = sharedPreferences.getInt("limit_checkpoints",50)
-        Log.d("TAG:", " goaldatetime is " + goalDateTimeToAlarm.timeInMillis)
+
         val btnDueDate: Button = root.findViewById(R.id.btnPickDueDate)
         val btnDueTime: Button = root.findViewById(R.id.btnPickDueTime)
         btnSubmit = root.findViewById(R.id.btnSubmitNewGoal)
@@ -70,12 +70,10 @@ class CreateNewGoalFragment : Fragment() {
                 Toast.makeText(root.context,"A goal must have a name, date and time",Toast.LENGTH_SHORT).show()
         }
         btnAddCheckpoint.setOnClickListener{
-            if(cpList.size <= limit)
+            if(cpList.size < limit)
                 createCheckpoint()
             else{
                 Toast.makeText(root.context, "Limited to only $limit checkpoints", Toast.LENGTH_SHORT).show()
-                Log.d("TAG:", "limit is "+ limit)
-                Log.d("TAG:", " size is "+ cpList.size)
             }
         }
 
@@ -85,9 +83,7 @@ class CreateNewGoalFragment : Fragment() {
     private fun submit() {
         val db = DatabaseHelper(root.context)
         val id = (db.getGoalDBCount() + 1)
-        Log.d(TAG,"id is "+ id)
         // can get a view by its id name
-
 
         newGoal = Goal(etGoalName.text.toString(),"0.0", goalDate, goalTime,
             false, id)
@@ -100,22 +96,16 @@ class CreateNewGoalFragment : Fragment() {
             if(cpTime == "Time")
                 cpTime = newGoal.time
             val ck = Checkpoint(cpName, cpDate, cpTime,false, id,db.getCheckpointDBCount()+1)
-            Log.d("TAG:", "et is $cpName d is $cpDate  d2 is $cpTime")
 
             val  cpTimeInMillis  = getCheckpointTimeInMillis(cpDate, cpTime)
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
-                Log.d("TAG:","Checkpoint in millis " + cpTimeInMillis + " ::  cp id " + ck.checkpointId)
-
                 val pendingIntent = AlarmReceiver.createPendingIntent(root.context, ck.checkpointId + 100000, "checkpoint", newGoal.goalName, newGoal.goalId)
 
                 AlarmReceiver.createAlarmManager(root.context, pendingIntent, cpTimeInMillis)
-                //createAlarmManager(ck.checkpointId, "checkpoint", cpTimeInMillis)
-
 
             }
             newGoal.addCheckpoint(ck)
             db.addCheckpointData(ck)
-            Log.d(TAG, "$cpName")
 
         }
 
@@ -134,7 +124,6 @@ class CreateNewGoalFragment : Fragment() {
     private fun getCheckpointTimeInMillis(checkpointDate:String, checkpointTime: String):Long{
         var dateArr = checkpointDate.split("-")
         var timeArr = checkpointTime.split(":")
-        Log.d("TAG:", " cp time is  $checkpointTime  [0] is ${timeArr[0]} [1] is ${timeArr[1]}")
         val cpDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
         cpDateTimeToAlarm.set(Calendar.YEAR, dateArr[0].toInt())
         cpDateTimeToAlarm.set(Calendar.MONTH, (dateArr[1].toInt() -1) )
@@ -150,7 +139,6 @@ class CreateNewGoalFragment : Fragment() {
         dialog.setTitle("Delete Checkpoint")
         dialog.setMessage("Do you want to delete this checkpoint")
         dialog.setPositiveButton( "Yes", DialogInterface.OnClickListener { dialogInterface, i ->
-            Log.d(TAG, "Deleting a checkpoint row")
             layout.removeView(item)
             cpList.remove(item)
             Toast.makeText(root.context,"Deleted!",Toast.LENGTH_SHORT).show()
@@ -170,7 +158,6 @@ class CreateNewGoalFragment : Fragment() {
         val dialog = AlertDialog.Builder(root.context)
         val d = Date()
         dp.minDate = d.time
-        //Toast.makeText(root.context,"min is " + dp.minDate + " : " + d, Toast.LENGTH_SHORT).show()
         dialog.setView(view)
         dialog.setTitle("Date Picker")
         dialog.setPositiveButton("Confirm"
@@ -191,8 +178,6 @@ class CreateNewGoalFragment : Fragment() {
                 goalDate = tmpDate
                 val tmp = "Due on : $goalDate at $goalTime"
                 tvDateAndTime.text = tmp
-
-                Log.d("TAG:", " goaldatetime is " + goalDateTimeToAlarm.timeInMillis)
 
             }
             else {

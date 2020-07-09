@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdapter.ViewHolder>(){
@@ -35,7 +34,6 @@ class GoalAdapter(val goalList: ArrayList<Goal>) : RecyclerView.Adapter<GoalAdap
 
                 val intent = Intent(itemView.context,DetailedGoalActivity::class.java)
 
-                Log.d("TAG:", "adapter:: " + goal.isFinished)
                 intent.putExtra("goal_name",goal.goalName)
                 intent.putExtra("goal_due_date", goal.getDateAsString())
                 intent.putExtra("goal_checkpoints",goal.getList())

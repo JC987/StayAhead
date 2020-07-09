@@ -9,10 +9,6 @@ import android.util.Log
 
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NAME, null, 1) {
-    init {
-        Log.d("TAG", "DatabaseHelper: NEW DB HELPER")
-
-    }
 
     override fun onCreate(sqLiteDatabase: SQLiteDatabase) {
         val createGoalTable = "CREATE TABLE " + GOAL_TABLE_NAME + "( ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -22,7 +18,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
                 GOAL_COL4 + " Time Default CURRENT_TIME, " +
                 GOAL_COL5 + " BOOLEAN)"
 
-        Log.d("TAG", "onCreate: table created")
         val createCheckpointTable = "CREATE TABLE $CHECKPOINT_TABLE_NAME ( ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "$CHECKPOINT_COL1 TEXT, " +
                 "$CHECKPOINT_COL2 INT, " +
@@ -31,7 +26,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
                 "$CHECKPOINT_COL5 BOOLEAN, "  +
                 "FOREIGN KEY($CHECKPOINT_COL2) REFERENCES $GOAL_TABLE_NAME(ID)" + ")"
 
-        Log.d("TAG", "onCreate: table created")
 
         sqLiteDatabase.execSQL(createGoalTable)
 
@@ -61,7 +55,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(GOAL_COL5, goal.isFinished)
         val result = db.insert(GOAL_TABLE_NAME, null, contentValues)
         val i: Int = -1
-        Log.d("TAG", "added called")
         GOAL_COUNT++
         return result != i.toLong()
     }
@@ -133,7 +126,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         val contentValues = ContentValues()
         val tmp = checkpoint.checkpointName
 
-        Log.d("TAG", ";;; " + checkpoint.checkpointName)
         contentValues.put(CHECKPOINT_COL1, tmp)
         contentValues.put(CHECKPOINT_COL2, checkpoint.goalId)
         if(checkpoint.date != "Date")
@@ -143,20 +135,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         contentValues.put(CHECKPOINT_COL5, checkpoint.isCompleted)
         val result = db.insert(CHECKPOINT_TABLE_NAME, null, contentValues)
         val i: Int = -1
-        //db.close()
-        Log.d("TAG", "added called")
         return result != i.toLong()
     }
 
     fun updateCheckpointData(updatedCheckpoint: Checkpoint){
         val db = this.writableDatabase
-        Log.d("TAG","col will be " + updatedCheckpoint.checkpointName)
         val contentValues = ContentValues()
         contentValues.put(CHECKPOINT_COL1,updatedCheckpoint.checkpointName)
         contentValues.put(CHECKPOINT_COL3,updatedCheckpoint.date)
         contentValues.put(CHECKPOINT_COL4,updatedCheckpoint.time)
-        //TODO: UPDATE newTime
-        //TODO: Remove logs and toast, update package name, clean code
         val where = "ID = ?"
         db.update(CHECKPOINT_TABLE_NAME,contentValues,where,arrayOf(updatedCheckpoint.checkpointId.toString()))
         //db.execSQL("UPDATE $CHECKPOINT_TABLE_NAME SET $CHECKPOINT_COL1 = '${newName}', $CHECKPOINT_COL3 = '${newDate}' WHERE ID = ${checkpointId}")
@@ -226,7 +213,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, GOAL_TABLE_NA
         db.execSQL("DELETE FROM SQLITE_SEQUENCE")
         db.execSQL("DELETE FROM $CHECKPOINT_TABLE_NAME")
         db.execSQL("VACUUM")
-        Log.d("TAG", "truncate tables")
     }
 
     private companion object {

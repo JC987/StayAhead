@@ -42,7 +42,6 @@ class HomeFragment : Fragment() {
         //allows for option menu
         setHasOptionsMenu(true)
         sharedPreferences = root.context.getSharedPreferences("settings",Context.MODE_PRIVATE)
-        Log.d("TAG","home!")
         rvList = root.findViewById<RecyclerView>(R.id.rvList)
 
         listItems = ArrayList<Goal>()
@@ -76,7 +75,6 @@ class HomeFragment : Fragment() {
 
     private fun resetList(sortKey:Int) {
         listItems.clear()
-        Log.d("TAG", "HF:: on resume")
         lateinit var cursor:Cursor
         when(sortKey){
             0 -> cursor = db.getActiveGoalsData(false)
@@ -89,8 +87,6 @@ class HomeFragment : Fragment() {
         editor.apply()
 
         while(cursor.moveToNext()){
-            //                                          goal name               percent                    date                          finished
-            Log.d("TAG","       c name is : " + cursor.getString(1) + " : " + cursor.getString(2) + " : " + cursor.getString(3) + " : " + cursor.getString(4) + " : key is "+ sortKey)
             val bool = cursor.getInt(5) > 0
             val newGoal = Goal(cursor.getString(1),cursor.getString(2), cursor.getString(3), cursor.getString(4), bool, cursor.getInt(0))
             listItems.add(newGoal)

@@ -5,18 +5,15 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
-import android.util.Log
-import android.widget.Toast
 import java.util.*
 
 class AlarmReceiver : BroadcastReceiver() {
     val TAG:String = "AlarmReceiver"
     override fun onReceive(p0: Context?, p1: Intent?) {
 
-        Log.d(TAG, "received")
+        //Log.d(TAG, "received")
         if(p1?.action.equals(Intent.ACTION_BOOT_COMPLETED)){
-            Log.d(TAG,"boot completed")
+            //Log.d(TAG,"boot completed")
             val db = DatabaseHelper(p0!!)
             val cursor = db.getActiveGoalsData(false)
             val d = Calendar.getInstance().time
@@ -25,7 +22,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 val goalDate = cursor.getString(3)
                 val goalTime = cursor.getString(4)
                 val dateTime = findDateTime(goalDate, goalTime)
-                Log.d("TAG:", "dateTime $dateTime  d.time ${d.time}")
+                //Log.d("TAG:", "dateTime $dateTime  d.time ${d.time}")
                 if(dateTime > d.time) {
 
                     val goalId = cursor.getInt(0)
@@ -56,7 +53,7 @@ class AlarmReceiver : BroadcastReceiver() {
             val notificationHelper = NotificationHelper(p0!!)
 
             if (p1?.getStringExtra("type") == "goal") {
-                Log.d(TAG, "type = goal")
+                //Log.d(TAG, "type = goal")
                 notificationHelper.getManager()
                     .notify(
                         p1.getIntExtra("code", 0),
@@ -66,7 +63,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     )
             }
             else if (p1?.getStringExtra("type") == "checkpoint") {
-                Log.d(TAG, "type = checkpoint")
+                //Log.d(TAG, "type = checkpoint")
                 notificationHelper.getManager().notify(
                     p1!!.getIntExtra("code", 0),
                     notificationHelper.createCheckpointReminderNotification(
@@ -98,14 +95,14 @@ class AlarmReceiver : BroadcastReceiver() {
 
     companion object{
         fun createAlarmManager(context: Context, pendingIntent: PendingIntent,time:Long){
-            Log.d("AlarmReceiver", "companion CAM: time is " + time)
+            //Log.d("AlarmReceiver", "companion CAM: time is " + time)
             val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             //am.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent)
             am.setRepeating(AlarmManager.RTC_WAKEUP, time, time,pendingIntent)
         }
 
         fun createPendingIntent(context: Context, resultCode:Int, typeValue:String, goalName:String, goalId: Int) : PendingIntent{
-            Log.d("AlarmReceiver","code $resultCode  type $typeValue  name $goalName")
+            //Log.d("AlarmReceiver","code $resultCode  type $typeValue  name $goalName")
             val notifyIntent = Intent(context.applicationContext, AlarmReceiver::class.java)
             notifyIntent.putExtra("goal_name",goalName)
             notifyIntent.putExtra("type",typeValue)

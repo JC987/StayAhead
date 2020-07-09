@@ -42,8 +42,6 @@ class EditGoalActivity : AppCompatActivity() {
         loadGoalData()
 
         loadCheckpointData()
-        Log.d("TAG:","currentGoal Date " + currentGoal.date)
-        val x = goalDateTimeToAlarm.timeInMillis
         val goalDateSplit = currentGoal.date.split("-")
         goalDateTimeToAlarm.set(Calendar.YEAR,Integer.parseInt(goalDateSplit[0]))
         goalDateTimeToAlarm.set(Calendar.MONTH, goalDateSplit[1].toInt() - 1)
@@ -51,10 +49,6 @@ class EditGoalActivity : AppCompatActivity() {
         goalDateTimeToAlarm.set(Calendar.HOUR, 0 )
         goalDateTimeToAlarm.set(Calendar.MINUTE, 0)
         goalDateTimeToAlarm.set(Calendar.SECOND, 0)
-
-        Log.d("TAG:", "x is "+ x + " h "+ hour + " m " +minute + " month " + (Integer.parseInt(goalDateSplit[1]) - 1))
-        Log.d("TAG:", "time is "+ goalDateTimeToAlarm.timeInMillis);
-       // Toast.makeText(this," " + x +" : x <- gdtta is " + goalDateTimeToAlarm.timeInMillis,Toast.LENGTH_LONG).show();
 
     }
 
@@ -107,9 +101,6 @@ class EditGoalActivity : AppCompatActivity() {
         //val db = DatabaseHelper(this)
         val goalCursor = db.getGoal(intent.getIntExtra("goal_id",1))
         goalCursor.moveToNext()
-        Log.d("TAG","count is " + goalCursor.count)
-        Log.d("TAG",goalCursor.getString(1))
-        Log.d("TAG",goalCursor.getString(3))
         etGoalName.setText(goalCursor.getString(1))
         val split = goalCursor.getString(4).split(":")
         hour = split[0].toInt()
@@ -199,7 +190,6 @@ class EditGoalActivity : AppCompatActivity() {
                 goalDateTimeToAlarm.set(Calendar.MONTH, dp.month)
                 goalDateTimeToAlarm.set(Calendar.DAY_OF_MONTH, dp.dayOfMonth )
 
-                Log.d("TAG:","x again " + goalDateTimeToAlarm.timeInMillis + " " + dp.month + "  " + dp.dayOfMonth)
             }
             else {
                 val dateTime = Calendar.getInstance(Locale.getDefault())//0//d.time
@@ -236,12 +226,10 @@ class EditGoalActivity : AppCompatActivity() {
         var tmpTime: String
         dialog.setPositiveButton("Confirm"){ _,_ ->
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                Toast.makeText(this, "TP: " + tp.hour + " : " + tp.minute, Toast.LENGTH_SHORT).show()
                 tpHour = tp.hour
                 tpMin = tp.minute
             }
             else {
-                Toast.makeText(this, "TP: " + tp.currentHour + " : " + tp.currentMinute, Toast.LENGTH_SHORT).show()
                 tpHour = tp.currentHour
                 tpMin = tp.currentMinute
             }
@@ -271,13 +259,11 @@ class EditGoalActivity : AppCompatActivity() {
 
     private fun saveNewCheckpoints(){
         //val db = DatabaseHelper(this)
-        Log.d("asdfasdf:", "time is "+ goalDateTimeToAlarm.timeInMillis);
         for (i:Int in 0 until newCheckpoints.size){
             val et =  newCheckpoints.get(i).getChildAt(0) as EditText
             var cpDate = ((newCheckpoints.get(i).getChildAt(1) as LinearLayout).getChildAt(0) as Button).text.toString()
             var cpTime = ((newCheckpoints.get(i).getChildAt(1) as LinearLayout).getChildAt(1) as Button).text.toString()
             var cpTimeInMillis = goalDateTimeToAlarm.timeInMillis
-            Log.d("asdfasdf:", "cpTime is "+ cpTime);
             if(cpDate != "Date") {
                 cpTimeInMillis = getCheckpointTimeInMillis(cpDate,cpTime)
             }
@@ -294,7 +280,6 @@ class EditGoalActivity : AppCompatActivity() {
             }
             db.addCheckpointData(ck)
 
-            Log.d("TAG", "${et.text}")
         }
     }
 
@@ -310,9 +295,7 @@ class EditGoalActivity : AppCompatActivity() {
             val ck = Checkpoint(updatedName,updatedDate,updatedTime,false, currentGoal.goalId, id)
 
             val cpTimeInMillis = getCheckpointTimeInMillis(updatedDate,updatedTime)
-            Log.d("TAG:","savePreviousCP : cp time " + cpTimeInMillis)
             if(sharedPreferences.getInt("send_checkpoint",1) == 1) {
-                Log.d("TAG:","send goal update alarm manager " + currentGoal.goalId + "  " + goalDateTimeToAlarm.timeInMillis + "  " + etGoalName.text.toString())
 
                 val pendingIntent = AlarmReceiver.createPendingIntent(this,ck.checkpointId + 100000,"checkpoint", etGoalName.text.toString(), currentGoal.goalId)
                 AlarmReceiver.createAlarmManager(this, pendingIntent, cpTimeInMillis)
@@ -323,17 +306,13 @@ class EditGoalActivity : AppCompatActivity() {
     }
 
     private fun saveGoal(){
-        //val db = DatabaseHelper(this)
-        //TODO: debug for edge cases
         //calculate new goal percent
         val df = DecimalFormat("0.0")
         val newPercent = (df.format(((numOfCheckpointsCompleted/numOfCheckpoints) * 100))).toString()
-        Log.d("TAG", "goaldate is " + currentGoal.date)
         //update checkpoint and alarm manager
         currentGoal.goalName = etGoalName.text.toString()
         currentGoal.remainingPercentage = newPercent
         if((sharedPreferences.getInt("send_goal",1) == 1) ) {
-            Log.d("TAG:","send goal update alarm manager " + currentGoal.goalId + "  " + goalDateTimeToAlarm.timeInMillis)
 
             val pendingIntent = AlarmReceiver.createPendingIntent(this,currentGoal.goalId,"goal", currentGoal.goalName, currentGoal.goalId)
             AlarmReceiver.createAlarmManager(this, pendingIntent, goalDateTimeToAlarm.timeInMillis)
@@ -363,7 +342,6 @@ class EditGoalActivity : AppCompatActivity() {
     private fun getCheckpointTimeInMillis(checkpointDate:String, checkpointTime: String):Long{
         val dateArr = checkpointDate.split("-")
         val timeArr = checkpointTime.split(":")
-        Log.d("TAG:", " cp time is  $checkpointTime  [0] is ${timeArr[0]} [1] is ${timeArr[1]}")
         val cpDateTimeToAlarm = Calendar.getInstance(Locale.getDefault())
         cpDateTimeToAlarm.set(Calendar.YEAR, dateArr[0].toInt())
         cpDateTimeToAlarm.set(Calendar.MONTH, (dateArr[1].toInt() -1) )

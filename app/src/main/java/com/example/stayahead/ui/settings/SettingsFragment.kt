@@ -121,7 +121,6 @@ class SettingsFragment : Fragment() {
             db.close()
         }
         dialog.setNegativeButton("No"){ dialogInterface, i ->
-            //Toast.makeText(root.context, "NOO",Toast.LENGTH_SHORT).show();
         }
         dialog.create()
         dialog.show()

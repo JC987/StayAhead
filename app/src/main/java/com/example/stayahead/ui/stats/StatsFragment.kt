@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import android.widget.Toast
 import com.example.stayahead.DatabaseHelper
 
 import com.example.stayahead.R
@@ -48,11 +47,9 @@ class StatsFragment : Fragment() {
                 when (position) {
                     0 -> {
                         defChart()
-                        //Toast.makeText(root.context, "pos " + position, Toast.LENGTH_SHORT).show()
                     }
                     1 -> {
                         checkpointStats()
-                        //Toast.makeText(root.context, "pos " + position, Toast.LENGTH_SHORT).show()
                     }
                     2 -> {
                         finishedGoalStats()
@@ -122,9 +119,7 @@ class StatsFragment : Fragment() {
         val n = db.getNumberOFCheckpointsCompleted().toFloat()
         val n2 = db.getNumberOFCheckpointsFailed().toFloat()
         val c = db.getAllCheckpointData(false)
-        while(c.moveToNext()){
-            Log.d("stats:" , "c " + c.getString(1) +" goal id " + c.getInt(2) + " completed " + c.getInt(4))
-        }
+
         pieChart.holeRadius = 25f
         pieChart.transparentCircleRadius = 50f
         val pieEntryList = listOf<PieEntry>(PieEntry( n,"Finished"),PieEntry( n2,"Failed"))
