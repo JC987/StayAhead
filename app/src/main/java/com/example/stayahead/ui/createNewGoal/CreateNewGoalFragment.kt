@@ -217,12 +217,12 @@ class CreateNewGoalFragment : Fragment() {
         var tmpTime = ""
         dialog.setPositiveButton("Confirm"){ _,_ ->
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                Toast.makeText(root.context, "TP: " + tp.hour + " : " + tp.minute, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(root.context, "TP: " + tp.hour + " : " + tp.minute, Toast.LENGTH_SHORT).show()
                 tpHour = tp.hour
                 tpMin = tp.minute
             }
             else {
-                Toast.makeText(root.context, "TP: " + tp.currentHour + " : " + tp.currentMinute, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(root.context, "TP: " + tp.currentHour + " : " + tp.currentMinute, Toast.LENGTH_SHORT).show()
                 tpHour = tp.currentHour
                 tpMin = tp.currentMinute
             }
